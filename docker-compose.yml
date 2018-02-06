@@ -20,6 +20,9 @@ services:
     volumes:
       - .:/usr/ketttle
 
+    environment:
+     - MONGO_URL=mongodb://mongo:27017/ketttle-db
+
   # The mongodb instance
   mongo:
     container_name: mongo
