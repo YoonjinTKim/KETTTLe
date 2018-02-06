@@ -1,0 +1,31 @@
+version: "2"
+
+services:
+  # The main server (node.js) instance
+  ketttle-server:
+    container_name: ketttle-server
+    # Use Dockerfile for build commands
+    build: .
+
+    # Expose ports
+    ports:
+      - "3000:3000"
+
+    # Link with mongo service
+    links:
+      - mongo
+
+    # Mount the project directory to the container's directory.
+    # This allows the nodemon process to hot reload in the container
+    volumes:
+      - .:/usr/ketttle
+
+  # The mongodb instance
+  mongo:
+    container_name: mongo
+    # Use the official mongo image
+    image: mongo
+    volumes:
+      - ./data:/data/db
+    ports:
+      - "27017:27017"
