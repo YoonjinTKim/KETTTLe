@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# TODO:
+# - Setup command line arguments so qsub knows which input file to use
+#   - Use -F flag to specify arguments for job
+# - Run the java command for FastViromeExplorer
+#   - java -cp bin FastViromeExplorer -1 $FILE_1 -2 $FILE_2 -i $INDEX_FILE -o $OUTPUT_DIR
+# - ssh to arc login node
+# - send curl request to /api/job_finished for job completion notification
+#   - The parameters should include the job id and the location path of the output file 
