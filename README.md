@@ -74,3 +74,6 @@ To view all jobs running, you can use
 ```bash
 $ showq -r
 ```
+
+All data sent to STDOUT and STDERR will be redirected to either `.o` or `.e` files (output and error, respectively). Any files and/or directories created from the job can
+be visible in the login node.
