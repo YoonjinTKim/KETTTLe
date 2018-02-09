@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# The script will outline the commands necessary to perform a FastViromeExplorer job.
+# There are two dependencies which FastViromeExplorer uses: kallisto and samtools.
+# Make sure that the two depedencies are installed and exist within your $PATH environment.
+
+# Purge existing modules
+module purge
+
+# Load java module for running FastViromeExplorer
+module load jdk/1.8.0
+
 # TODO:
 # - Setup command line arguments so qsub knows which input file to use
 #   - Use -F flag to specify arguments for job

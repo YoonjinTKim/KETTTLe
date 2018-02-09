@@ -1,5 +1,20 @@
 ## ARC (Advanced Research Computing)
 
+### Getting Started
+
+Make sure you have `FastViromeExplorer` installed on your login node.
+
+```bash
+$ git clone https://code.vt.edu/saima5/FastViromeExplorer.git
+```
+
+Then, include the `kallisto` and `samtools` dependencies to your `$PATH` environment variable.
+You can simply write it your `bash` config file so you don't have to do this every time.
+```bash
+$ echo "export PATH=\$PATH:/home/<PID>/FastViromeExplorer/tools-linux" > ~/.bashrc
+```
+
+
 ### Documentation
 
 Once you have access to ARC, you'll need to know some commands to be able to run jobs and view its progress/output.
