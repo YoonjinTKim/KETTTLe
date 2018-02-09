@@ -18,3 +18,4 @@ module load jdk/1.8.0
 # - ssh to arc login node
 # - send curl request to /api/job_finished for job completion notification
 #   - The parameters should include the job id and the location path of the output file 
+#   - curl $URL/api/jobs/finished/$JOB_ID -X POST
