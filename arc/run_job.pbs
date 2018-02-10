@@ -10,6 +10,10 @@ module purge
 # Load java module for running FastViromeExplorer
 module load jdk/1.8.0
 
+# Samtools dependency
+module load gcc/5.2.0
+module load samtools/1.2
+
 # TODO:
 # - Setup command line arguments so qsub knows which input file to use
 #   - Use -F flag to specify arguments for job
