@@ -7,3 +7,4 @@ app.get('/', (req, res) => res.send('Hello World!'));
 
 // All business related logic should be under the api route.
 app.use('/api', require('./api'));
+app.use('/', express.static('public'));
