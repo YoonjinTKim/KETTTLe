@@ -30,11 +30,11 @@ module.exports = {
 
     submitJob: (req, res) => {
         var form = new formidable.IncomingForm();
-        form.parse(req, (err, fields, { file }) => {
-            res.end();
+        form.parse(req, (err, fields, { read_1, read_2 }) => {
+            res.redirect('/');
 
             // First, copy input to arc login node.
-            arc.copyFile(file.path)
+            arc.copyFile(read_1.path, read_2.path)
                 .then(() => {
                     // TODO: ssh into arc login node and run qsub script with
                     // correct arguments.

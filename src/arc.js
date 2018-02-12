@@ -1,15 +1,10 @@
 var fs = require('fs');
-var scp = require('scp2');
+var exec = require('child_process').exec;
 
 module.exports = {
-    copyFile: (filepath) => {
+    copyFile: (read1, read2) => {
         return new Promise((resolve, reject) => {
-            scp.scp(filepath, {
-                host: 'newriver1.arc.vt.edu',
-                username: '', // TODO: determine user account
-                privateKey: '', // TODO: add path to private key
-                path: '' // TODO: determine path for storing file
-            }, (err) => {
+            exec(`scp ${read1} ${read2} vincentl@newriver1.arc.vt.edu:`, (err, stdout, stdin) => {
                 if (err)
                     reject(err);
                 else

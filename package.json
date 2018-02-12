@@ -14,7 +14,6 @@
     "expressjs": "^1.0.1",
     "formidable": "^1.1.1",
     "mongojs": "^2.5.0",
-    "nodemon": "^1.14.12",
-    "scp2": "^0.5.0"
+    "nodemon": "^1.14.12"
   }
 }
