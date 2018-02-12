@@ -1,25 +1,28 @@
 #!/bin/bash
 
+# Arguments:
+# There are four arguments for the job:
+# 1. input read path
+# 2. input read path
+# 3. index path
+# 4. output path
+
 # The script will outline the commands necessary to perform a FastViromeExplorer job.
 # There are two dependencies which FastViromeExplorer uses: kallisto and samtools.
 # Make sure that the two depedencies are installed and exist within your $PATH environment.
 
-# Purge existing modules
+# Purge existing modules.
 module purge
 
-# Load java module for running FastViromeExplorer
+# Load java module for running FastViromeExplorer.
 module load jdk/1.8.0
 
-# Samtools dependency
-module load gcc/5.2.0
-module load samtools/1.2
+# Copy the java binaries to $WORK for fast I/O operations.
+cp $HOME/FastViromeExplorer/bin $WORK
 
-# TODO:
-# - Setup command line arguments so qsub knows which input file to use
-#   - Use -F flag to specify arguments for job
-# - Run the java command for FastViromeExplorer
-#   - java -cp bin FastViromeExplorer -1 $FILE_1 -2 $FILE_2 -i $INDEX_FILE -o $OUTPUT_DIR
-# - ssh to arc login node
-# - send curl request to /api/job_finished for job completion notification
-#   - The parameters should include the job id and the location path of the output file 
-#   - curl $URL/api/jobs/finished/$JOB_ID -X POST
+java -cp $WORK FastViromeExplorer -1 $1 -2 $2 -i $3 -o $4
+
+# ssh to the login node to send a request to the node server that the job is complete.
+# TODO: the curl url should be replaced with the production url.
+ssh vincentl@newriver1.arc.vt.edu \
+    "curl https://7f6c927c.ngrok.io/api/jobs/finished/$4 -X POST"
