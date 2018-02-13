@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+
+
+    <title>KETTTLe - Online database for FastViromeExplorer</title>
+
+    <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- Custom styles for this template -->
+    <style>
+      body {
+        padding-top: 54px;
+        text-align:center; vertical-align:middle;
+      }
+      @media (min-width: 992px) {
+        body {
+          padding-top: 56px;
+        }
+      }
+
+    </style>
+
+  </head>
+
+  <body>
+    
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">KETTTLe</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Log In</a>
+
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Create Account</a>
+            </li>
+
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Upload</a>
+              <span class="sr-only">(current)</span>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+      <div class="overlay"></div>
+
+    <div class="container-fluid graphs padding-bottom-6">
+        <div class="content">
+
+            <h1 class="text-center">Upload Sample</h1>
+            <div class="row">
+
+                <div class="col-md-offset-3 col-md-6 col-sm-12 col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+
+                            <!-- {% if Success != None %}
+                                <div class="alert alert-success" role="alert">
+                                    <p style="display: inline">Graph is now viewable at:</p>
+                                    <a href="{{ Success }}" class="alert-link">{{ Success }}!</a>
+                                    {% if uid == None %}
+                                        <br>
+                                        <br>
+                                        **Please note that this URL in your records. We will delete this graph after
+                                        <b>30 days</b>. If you like GraphSpace and would like persistent storage of your
+                                        graphs, please consider
+                                        <a id="create" class="alert-link">creating an account</a>.
+                                        <br>
+                                    {% endif %}
+                                </div>
+                            {% elif Error != None %}
+                                <div class="alert alert-danger" role="alert">
+                                    <samp>Error: {{ Error }}</samp>
+                                </div>
+                            {% endif %}
+ -->
+
+                            <form id="UploadGraphForm" action="{% url 'upload_graph' %}" role="form"
+                                  enctype="multipart/form-data" method="POST">
+                                <!-- {% csrf_token %} -->
+                                <div class="control-group">
+                                    <label for="GraphNameInput">Graph Name:</label>
+                                    <input id="GraphNameInput" class="form-control" maxlength="32" type="text"
+                                           name="name" autocomplete="off" placeholder="Required"/>
+                                </div>
+
+                                <br>
+
+                               <!--  {% if uid %}
+                                    <input type="number" name="is_public" hidden value="0"/>
+                                    <input type="string" name="owner_email" hidden value="{{ uid }}"/>
+                                {% else %}
+                                    <input type="number" name="is_public" hidden value="1"/>
+                                {% endif %}
+ -->
+                                <div class="control-group">
+                                    <label for="GraphFileInput">Upload the sample file:</label>
+                                    <input id="GraphFileInput" type="file" name="graph_file" class="file"
+                                           accept=".txt,.sam">
+                                    <div class="input-group col-xs-12">
+                                        <input type="text" class="browse form-control"
+                                               placeholder="Required">
+                                        <span class="browse input-group-btn">
+                                            <button class="browse btn btn-default" type="button">
+                                                <i class="glyphicon glyphicon-search"></i> Browse
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <br>
+
+                                <div class="control-group">
+                                    <label for="GraphFileInput">Upload the index file:</label>
+                                    <input id="GraphFileInput" type="file" name="graph_file" class="file"
+                                           accept=".idx">
+                                    <div class="input-group col-xs-12">
+                                        <input type="text" class="browse form-control"
+                                               placeholder="Required">
+                                        <span class="browse input-group-btn">
+                                            <button class="browse btn btn-default" type="button">
+                                                <i class="glyphicon glyphicon-search"></i> Browse
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <br>
+
+                                <div class="control-group">
+                                    <label for="StyleFileInput">Upload the database (Optional):</label>
+                                    <input id="StyleFileInput" type="file" name="style_file" class="file"
+                                           accept=".txt, .sam">
+                                    <div class="input-group col-xs-12">
+                                        <input type="text" class="browse form-control"
+                                               placeholder="Optional">
+                                        <span class="browse input-group-btn">
+                                            <button class="browse btn btn-default" type="button">
+                                                <i class="glyphicon glyphicon-search"></i> Browse
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <button type="button" id="UploadGraphBtn" data-loading-text="Submitting..."
+                                        class="btn btn-primary gs-full-width" autocomplete="off">
+                                    Submit
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <!--  <script>
+    // Solution found at http://stackoverflow.com/questions/17534661/make-anchor-link-go-some-pixels-above-where-its-linked-to
+    // The function actually applying the offset
+    function offsetAnchor() {
+        if (location.hash.length !== 0) {
+            window.scrollTo(window.scrollX, window.scrollY - 200);
+        }
+    }
+    header.init();
+
+    // This will capture hash changes while on the page
+    window.addEventListener("hashchange", offsetAnchor);
+
+    // This is here so that when you enter the page with a hash,
+    // it can provide the offset in that case too. Having a timeout
+    // seems necessary to allow the browser to jump to the anchor first.
+    window.setTimeout(offsetAnchor, 2); // The delay of 1 is arbitrary and may not always work right (although it did in my testing).
+</script> -->
+ <!-- Bootstrap core JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  </body>
+
+</html>
+
