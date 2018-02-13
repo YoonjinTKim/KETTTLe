@@ -4,8 +4,7 @@ var jobs = require('./jobs');
 
 router.get('/jobs', jobs.listJobs);
 router.get('/jobs/:jid', jobs.findJob);
-router.post('/jobs', jobs.createJob);
+router.post('/jobs', jobs.submitJob);
 router.post('/jobs/finished/:jid', jobs.completeJob);
-router.post('/jobs/submit', jobs.submitJob);
 
 module.exports = router;

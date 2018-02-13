@@ -13,14 +13,6 @@ module.exports = {
         });
     },
 
-    createJob: (req, res) => {
-        // TODO: populate job data object with input file name, user info, etc...
-        var jobData = {};
-        db.jobs.insert(jobData, (err, result) => {
-            res.send(result);
-        });
-    },
-
     completeJob: (req, res) => {
         db.jobs.find({ _id: db.ObjectId(req.params.jid) }, (err, result) => {
             // TODO: notify user job is done, save job output file location and update job status
@@ -33,13 +25,21 @@ module.exports = {
         form.parse(req, (err, fields, { read_1, read_2 }) => {
             res.redirect('/');
 
-            // First, copy input to arc login node.
-            arc.copyFile(read_1.path, read_2.path)
-                .then(() => {
-                    // TODO: ssh into arc login node and run qsub script with
-                    // correct arguments.
+            var jobData = { updated_at: new Date() };
+            db.jobs.insert(jobData, (err, result) => {
+                var jobId = result._id;
+                // Copy input to arc login node.
+                arc.copyFile(read_1.path, read_2.path, jobId)
+                    .then(() => {
+                        // TODO: ssh into arc login node and run qsub script with correct arguments.
+                        console.log('done');
 
-                });
+                    })
+                    .catch((err) => {
+                        // TODO: add error logging
+                        console.log(err);
+                    });
+            });
         });
     }
 };
