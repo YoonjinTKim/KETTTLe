@@ -10,5 +10,11 @@ app.get('/', (req, res) => res.send('Hello World!'));
 
 // All business related logic should be under the api route.
 app.use('/api', require('./api'));
+
+// HACK: manually append html extension to url
+app.use((req, res, next) => {
+    req.url += '.html';
+    next();
+});
 app.use('/', express.static('templates'));
 
