@@ -30,11 +30,7 @@ module.exports = {
                 var jobId = result._id;
                 // Copy input to arc login node.
                 arc.copyFile(read_1.path, read_2.path, jobId)
-                    .then(() => {
-                        // TODO: ssh into arc login node and run qsub script with correct arguments.
-                        console.log('done');
-
-                    })
+                    .then(() => arc.runJob(jobId))
                     .catch((err) => {
                         // TODO: add error logging
                         console.log(err);
