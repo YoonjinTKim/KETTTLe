@@ -8,19 +8,24 @@ module.exports = {
                 mkdir /tmp/${pathname} &&
                 mv ${read1} /tmp/${pathname}/read_1.fq &&
                 mv ${read2} /tmp/${pathname}/read_2.fq &&
-                scp -v -r /tmp/${pathname} vincentl@newriver1.arc.vt.edu:
-                `, (err) => {
-                    if (err)
-                        reject(err);
-                    else
-                        resolve();
-            });
+                scp -v -r /tmp/${pathname} vincentl@newriver1.arc.vt.edu:`,
+                (err) => promiseHandler(err, resolve, reject)
+            );
         });
     },
 
     runJob: (jobId) => {
         exec(`ssh vincentl@newriver1.arc.vt.edu "${qsubCommand()}"`, (err, stdout) => {
             console.log(stdout)
+        });
+    },
+
+    retrieveOutput: (jobId) => {
+        return new Promise((resolve, reject) => {
+            // TODO: copy actual job specific output
+            exec(`scp vincentl@newriver1.arc.vt.edu:run_job.pbs /tmp/${jobId}`,
+                (err) => promiseHandler(err, resolve, reject)
+            );
         });
     }
 };
@@ -31,4 +36,11 @@ function qsubCommand(jobId) {
 
 function qsubArguments(jobId) {
     return `$HOME/${jobId}/read_1.fq $HOME/${jobId}/read_2.fq $HOME/FastViromeExplorer/test/testset-kallisto-index.idx ${jobId}`;
+}
+
+function promiseHandler(err, resolve, reject, result) {
+    if (err)
+        reject(err);
+    else
+        resolve(result);
 }

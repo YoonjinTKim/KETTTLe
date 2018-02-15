@@ -13,6 +13,23 @@ module.exports = {
         });
     },
 
+    downloadJob: (req, res) => {
+        db.jobs.findOne({ _id: db.ObjectId(req.params.jid) }, (err, result) => {
+            if (err || !result || result.status !== 'completed') {
+                res.send({ message: 'Job does not exist or has not been finished'});
+            }
+
+            arc.retrieveOutput(req.params.jid)
+                .then((result) => {
+                    res.download(`/tmp/${req.params.jid}`);
+                })
+                .catch((err) => {
+                    // TODO: error logging
+                    console.log(err);
+                });
+        });
+    },
+
     completeJob: (req, res) => {
         db.jobs.update({ _id: db.ObjectId(req.params.jid) }, {
             $set: { status: 'completed' }
