@@ -1,4 +1,6 @@
 
+//we want to add affiliation later
+
 var db = require('../db');
 
 module.exports = {
