@@ -15,7 +15,7 @@ module.exports = {
     },
 
     runJob: (jobId) => {
-        exec(`ssh vincentl@newriver1.arc.vt.edu "${qsubCommand()}"`, (err, stdout) => {
+        exec(`ssh vincentl@newriver1.arc.vt.edu "${qsubCommand(jobId)}"`, (err, stdout) => {
             console.log(stdout)
         });
     },
@@ -23,7 +23,7 @@ module.exports = {
     retrieveOutput: (jobId) => {
         return new Promise((resolve, reject) => {
             // TODO: copy actual job specific output
-            exec(`scp vincentl@newriver1.arc.vt.edu:run_job.pbs /tmp/${jobId}`,
+            exec(`scp vincentl@newriver1.arc.vt.edu:${jobId}/FastViromeExplorer-final-sorted-abundance.tsv /tmp/${jobId}.txt`,
                 (err) => promiseHandler(err, resolve, reject)
             );
         });
@@ -35,7 +35,7 @@ function qsubCommand(jobId) {
 }
 
 function qsubArguments(jobId) {
-    return `$HOME/${jobId}/read_1.fq $HOME/${jobId}/read_2.fq $HOME/FastViromeExplorer/test/testset-kallisto-index.idx ${jobId}`;
+    return `${jobId}/read_1.fq ${jobId}/read_2.fq FastViromeExplorer/test/testset-kallisto-index.idx ${jobId}`;
 }
 
 function promiseHandler(err, resolve, reject, result) {

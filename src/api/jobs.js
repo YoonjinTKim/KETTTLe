@@ -21,7 +21,7 @@ module.exports = {
 
             arc.retrieveOutput(req.params.jid)
                 .then((result) => {
-                    res.download(`/tmp/${req.params.jid}`);
+                    res.download(`/tmp/${req.params.jid}.out`);
                 })
                 .catch((err) => {
                     // TODO: error logging
