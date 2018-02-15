@@ -14,9 +14,11 @@ module.exports = {
     },
 
     completeJob: (req, res) => {
-        db.jobs.find({ _id: db.ObjectId(req.params.jid) }, (err, result) => {
-            // TODO: notify user job is done, save job output file location and update job status
+        db.jobs.update({ _id: db.ObjectId(req.params.jid) }, {
+            $set: { status: 'completed' }
+        }, (err, result) => {
             res.send(result);
+            console.log(result);
         });
     },
 
@@ -25,7 +27,12 @@ module.exports = {
         form.parse(req, (err, fields, { read_1, read_2 }) => {
             res.redirect('/');
 
-            var jobData = { updated_at: new Date() };
+            var jobData = {
+                updated_at: new Date(),
+                status: 'submitted'
+                // TODO: add user data
+            };
+
             db.jobs.insert(jobData, (err, result) => {
                 var jobId = result._id;
                 // Copy input to arc login node.
