@@ -1,0 +1,18 @@
+extends header
+
+block content
+    h1 Register
+    form(action = '/api/users' method = 'POST')
+        label Email: 
+        input(type='email' name='email')
+        br
+        label Affiliation: 
+        input(type='text' name='affiliation')
+        br
+        label Password:
+        input(type='password' name='password')
+        br
+        label Confirm Password:
+        input(type='password' name='password')
+        br
+        input(type='submit' value='Submit')

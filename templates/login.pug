@@ -1,0 +1,12 @@
+extends header
+
+block content
+    h1 Login
+    form(action='/api/users/login' method='POST')
+        label Email: 
+        input(type='email' name='email')
+        br
+        label Password:
+        input(type='password' name='password')
+        br
+        input(type='submit' value='Submit')

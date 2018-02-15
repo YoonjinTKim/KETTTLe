@@ -8,6 +8,7 @@ router.get('/jobs/:jid', jobs.findJob);
 router.get('/jobs/download/:jid', jobs.downloadJob);
 router.post('/jobs', jobs.submitJob);
 router.post('/jobs/finished/:jid', jobs.completeJob);
+
 router.post('/users', users.createUser);
 
 module.exports = router;
