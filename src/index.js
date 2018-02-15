@@ -2,13 +2,13 @@ var express = require('express');
 var db = require('./db');
 var bodyParser = require('body-parser');
 var passport = require('passport');
-var strategy = require('passport-local').Strategy;
+var Strategy = require('passport-local').Strategy;
 
 /*
 user auth code from 
 https://github.com/passport/express-4.x-local-example
 */
-passport.use(new LocalStrategy({
+passport.use(new Strategy({
     usernameField: 'email',
     passwordField: 'passwd',
     session: false
