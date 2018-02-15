@@ -35,12 +35,17 @@ html(lang='en')
                         li(class='nav-item')
                             a(class='nav-link' href='/about') About
 
-                        li(class='nav-item')
-                            a(class='nav-link' href='/login') Log In
 
-                        li(class='nav-item')
-                            a(class='nav-link' href='/register') Create Account
+                        if logged_in
+                            li(class='nav-item')
+                                a(class='nav-link' href='/upload') Upload
 
-                        li(class='nav-item')
-                            a(class='nav-link' href='/upload') Upload
+                            li(class='nav-item')
+                                a(class='nav-link' href='/api/users/logout') Logout
+                        else
+                            li(class='nav-item')
+                                a(class='nav-link' href='/login') Log In
+
+                            li(class='nav-item')
+                                a(class='nav-link' href='/register') Create Account
         block content

@@ -1,11 +1,12 @@
 var path = require('path');
 var express = require('express');
-var db = require('./db');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var cookierparser = require('cookie-parser');
 var session = require('express-session');
-var ensureLogin = require('connect-ensure-login')
+
+var db = require('./db');
+var users = require('./api/users');
 
 var Strategy = require('passport-local').Strategy;
 
@@ -15,11 +16,10 @@ var Strategy = require('passport-local').Strategy;
  **/
 passport.use(new Strategy({
     usernameField: 'email',
-    passwordField: 'passwd',
+    passwordField: 'password',
     session: false
-},
-    (email, password, done) => {
-        db.users.find({ email: email }, function (err, user) {
+}, (email, password, done) => {
+        db.users.findOne({ email: email }, (err, user) => {
             if (err) { return done(err); }
             if (!user) { return done(null, false); }
             if (user.password.split('').reverse().join('') != password) { return done(null, false); }
@@ -28,12 +28,12 @@ passport.use(new Strategy({
     }
 ));
 
-passport.serializeUser(function(user, cb) {
-  cb(null, user.id);
+passport.serializeUser((user, cb) => {
+  cb(null, user._id);
 });
 
-passport.deserializeUser(function(id, cb) {
-  db.users.findById(id, function (err, user) {
+passport.deserializeUser((_id, cb) => {
+  db.users.findOne({ _id: db.ObjectId(_id) }, (err, user) => {
     if (err) { return cb(err); }
     cb(null, user);
   });
@@ -59,18 +59,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // requests for authentification
-app.post('/login', passport.authenticate('local', { failureRedirect: '/login' }), (req, res) => {
-    res.redirect('/');
-});
-  
-app.get('/logout', (req, res) => {
-    req.logout();
-    res.redirect('/');
-});
-
-app.get('/profile', ensureLogin.ensureLoggedIn(), (req, res) => {
-    res.render('profile', { user: req.user });
-});
+app.post('/api/users/login', passport.authenticate('local', { failureRedirect: '/login' }), users.login);
 
 // All business related logic should be under the api route.
 app.use('/api', require('./api'));

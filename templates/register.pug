@@ -4,15 +4,15 @@ block content
     h1 Register
     form(action = '/api/users' method = 'POST')
         label Email: 
-        input(type='email' name='email')
+        input(type='email' name='email' autocomplete='username' required)
         br
         label Affiliation: 
-        input(type='text' name='affiliation')
+        input(type='text' name='affiliation' autocomplete='affiliation' required)
         br
         label Password:
-        input(type='password' name='password')
+        input(id='password' type='password' name='password' autocomplete='new-password' required)
         br
         label Confirm Password:
-        input(type='password' name='password')
+        input(id='confirmed_password' type='password' name='confirmed_password' autocomplete='new-password' required)
         br
         input(type='submit' value='Submit')
