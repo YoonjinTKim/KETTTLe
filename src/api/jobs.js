@@ -21,7 +21,7 @@ module.exports = {
 
             arc.retrieveOutput(req.params.jid)
                 .then((result) => {
-                    res.download(`/tmp/${req.params.jid}.out`);
+                    res.download(`/tmp/${req.params.jid}.txt`);
                 })
                 .catch((err) => {
                     // TODO: error logging
@@ -42,12 +42,12 @@ module.exports = {
     submitJob: (req, res) => {
         var form = new formidable.IncomingForm();
         form.parse(req, (err, fields, { read_1, read_2 }) => {
-            res.redirect('/');
+            res.redirect('/jobs');
 
             var jobData = {
                 updated_at: new Date(),
-                status: 'submitted'
-                // TODO: add user data
+                status: 'submitted',
+                user_id: req.user._id
             };
 
             db.jobs.insert(jobData, (err, result) => {

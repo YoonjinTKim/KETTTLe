@@ -2,11 +2,12 @@ extends header
 
 block content
     h1 Upload
-    form(action = '/api/jobs' method = 'POST')
+    form(action='/api/jobs' enctype='multipart/form-data' method='POST')
         label Read 1: 
         input(type='file' name='read_1')
         br
         label Read 2: 
         input(type='file' name='read_2')
         br
+        input(type='hidden' value=user_id name='user_id')
         input(type='submit' value='Upload')
