@@ -1,0 +1,20 @@
+extends header
+
+block content
+    h1 Jobs
+    table(class='table table-hover')
+        tr
+            td id
+            td status
+            td output
+            td last updated
+        each job in jobs
+            tr
+                td #{job._id}
+                td #{job.status}
+                if job.status === 'completed'
+                    td 
+                        a(class='nav-link' href='/api/jobs/download/' + job._id) Download
+                else
+                    td -
+                td #{job.updated_at}
