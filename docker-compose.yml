@@ -4,6 +4,7 @@ services:
   # The main server (node.js) instance
   ketttle-server:
     container_name: ketttle-server
+
     # Use Dockerfile for build commands
     build: .
 
@@ -22,6 +23,8 @@ services:
 
     environment:
      - MONGO_URL=mongodb://mongo:27017/ketttle-db
+     - ARC_USER=${ARC_USER}
+     - KETTTLE_EMAIL_PW=${KETTTLE_EMAIL_PW}
 
   # The mongodb instance
   mongo:

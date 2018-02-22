@@ -1,11 +1,12 @@
 #!/bin/bash
 
 # Arguments:
-# There are four arguments for the job:
+# There are five arguments for the job:
 # 1. input read path
 # 2. input read path
 # 3. index path
 # 4. output path
+# 5. arc username
 
 # The script will outline the commands necessary to perform a FastViromeExplorer job.
 # There are two dependencies which FastViromeExplorer uses: kallisto and samtools.
@@ -27,5 +28,5 @@ java -cp $WORK/bin FastViromeExplorer \
 
 # ssh to the login node to send a request to the node server that the job is complete.
 # TODO: the curl url should be replaced with the production url.
-ssh vincentl@newriver1.arc.vt.edu \
+ssh $5@newriver1.arc.vt.edu \
     "curl https://7f6c927c.ngrok.io/api/jobs/finished/$4 -X POST"

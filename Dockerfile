@@ -14,7 +14,11 @@ COPY package.json /usr/ketttle
 RUN npm install
 
 # Docker is a virtualized OS so it cannot access the private key unless it exists in itself
-#COPY arc_rsa /root/.ssh/id_rsa
+COPY arc_rsa /root/.ssh/id_rsa
+
+# The initial ssh connection requires fingerprints to establish a connection
+COPY known_hosts /root/.ssh/known_hosts
+RUN chmod 644 /root/.ssh/known_hosts
 
 # Copy entire project directory
 COPY . /usr/ketttle

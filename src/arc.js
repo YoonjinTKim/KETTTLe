@@ -8,14 +8,14 @@ module.exports = {
                 mkdir /tmp/${pathname} &&
                 mv ${read1} /tmp/${pathname}/read_1.fq &&
                 mv ${read2} /tmp/${pathname}/read_2.fq &&
-                scp -v -r /tmp/${pathname} vincentl@newriver1.arc.vt.edu:`,
+                scp -v -r /tmp/${pathname} ${process.env.ARC_USER}@newriver1.arc.vt.edu:`,
                 (err) => promiseHandler(err, resolve, reject)
             );
         });
     },
 
     runJob: (jobId) => {
-        exec(`ssh vincentl@newriver1.arc.vt.edu "${qsubCommand(jobId)}"`, (err, stdout) => {
+        exec(`ssh ${process.env.ARC_USER}@newriver1.arc.vt.edu "${qsubCommand(jobId)}"`, (err, stdout) => {
             console.log(stdout)
         });
     },
@@ -23,7 +23,7 @@ module.exports = {
     retrieveOutput: (jobId) => {
         return new Promise((resolve, reject) => {
             // TODO: copy actual job specific output
-            exec(`scp vincentl@newriver1.arc.vt.edu:${jobId}/FastViromeExplorer-final-sorted-abundance.tsv /tmp/${jobId}.txt`,
+            exec(`scp ${process.env.ARC_USER}@newriver1.arc.vt.edu:${jobId}/FastViromeExplorer-final-sorted-abundance.tsv /tmp/${jobId}.txt`,
                 (err) => promiseHandler(err, resolve, reject)
             );
         });
@@ -35,7 +35,7 @@ function qsubCommand(jobId) {
 }
 
 function qsubArguments(jobId) {
-    return `${jobId}/read_1.fq ${jobId}/read_2.fq FastViromeExplorer/test/testset-kallisto-index.idx ${jobId}`;
+    return `${jobId}/read_1.fq ${jobId}/read_2.fq FastViromeExplorer/test/testset-kallisto-index.idx ${jobId} ${process.env.ARC_USER}`;
 }
 
 function promiseHandler(err, resolve, reject, result) {
