@@ -1,6 +1,7 @@
 var formidable = require('formidable');
 var db = require('../db');
 var arc = require('../arc');
+var mailer = require('../mailer');
 
 module.exports = {
     listJobs: (req, res) => {
@@ -35,8 +36,9 @@ module.exports = {
             $set: { status: 'completed' }
         }, (err, result) => {
             res.send(result);
-            console.log(result);
         });
+
+        mailer.notify(req.params.jid);
     },
 
     submitJob: (req, res) => {
