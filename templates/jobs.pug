@@ -7,6 +7,7 @@ block content
             td id
             td status
             td output
+            td visualization
             td last updated
         each job in jobs
             tr
@@ -15,6 +16,9 @@ block content
                 if job.status === 'completed'
                     td 
                         a(class='nav-link' href='/api/jobs/download/' + job._id) Download
+                    td 
+                        a(class='nav-link' href='#') Visualize
                 else
+                    td -
                     td -
                 td #{job.updated_at}
