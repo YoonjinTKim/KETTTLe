@@ -29,3 +29,10 @@ The `Dockerfile` and `docker-compose.yml` files are commented with what each com
 ```bash
 $ docker-compose up
 ```
+
+### Environment Variables
+The node server requires a few environment variables to be setup. They are not included in this directory for security purposes.
+
+- MONGO_URL (automatically configured Docker)
+- ARC_USER (determines which arc account to use)
+- KETTTLE_EMAIL_PW (allows access to email)
