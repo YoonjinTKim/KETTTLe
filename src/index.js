@@ -7,8 +7,10 @@ var session = require('express-session');
 
 var db = require('./db');
 var users = require('./api/users');
-
 var Strategy = require('passport-local').Strategy;
+var Queue = require('./Queue');
+
+var jobQueue = new Queue();
 
 /***
  * user auth code from
@@ -53,6 +55,12 @@ app.use(session({
 app.use('/public', express.static(path.join(__dirname, '../public')));
 app.set('view engine', 'pug')
 app.set('views', path.join(__dirname, '../templates'));
+
+// Middleware for hoisting queue variable into all requests.
+app.use((req, res, next) => {
+    req.jobQueue = jobQueue;
+    next();
+});
 
 // initilize the passport session
 app.use(passport.initialize());

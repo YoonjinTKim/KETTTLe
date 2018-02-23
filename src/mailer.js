@@ -48,7 +48,7 @@ function notify(job_id) {
                 return;
             }
             var template = pug.renderFile('./templates/job_notification.pug', { job_id });
-            _send(result[0].user[0].email, 'Job Completion', template);
+            _send(result[0].user[0].email, 'Your job has been finished', template);
         });
 }
 
