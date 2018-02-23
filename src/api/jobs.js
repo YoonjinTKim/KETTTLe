@@ -2,6 +2,7 @@ var formidable = require('formidable');
 var db = require('../db');
 var arc = require('../arc');
 var mailer = require('../mailer');
+var logger = require('../logger');
 
 module.exports = {
     listJobs: (req, res) => {

@@ -4,10 +4,13 @@ var db = require('./db');
 var logger = require('./logger');
 
 var transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: 'Gmail',
     auth: {
+        type: 'OAuth2',
         user: 'ketttlenotification@gmail.com',
-        pass: process.env.KETTTLE_EMAIL_PW
+        clientId: process.env.KETTTLE_EMAIL_CLIENT_ID,
+        clientSecret: process.env.KETTTLE_EMAIL_CLIENT_SECRET,
+        refreshToken: process.env.KETTTLE_EMAIL_REFRESH_TOKEN
     }
 });
 
@@ -20,7 +23,6 @@ function _send(to, subject, html) {
     };
     transporter.sendMail(options, (err, info) => {
         if (err) {
-            console.log(err, process.env.KETTTLE_EMAIL_PW);
             logger.log({ level: 'error', message: 'Failed to send email for finished job', err, info, options });
         }
     });

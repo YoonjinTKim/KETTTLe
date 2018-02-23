@@ -24,7 +24,9 @@ services:
     environment:
      - MONGO_URL=mongodb://mongo:27017/ketttle-db
      - ARC_USER=${ARC_USER}
-     - KETTTLE_EMAIL_PW=${KETTTLE_EMAIL_PW}
+     - KETTTLE_EMAIL_CLIENT_ID=${KETTTLE_EMAIL_CLIENT_ID}
+     - KETTTLE_EMAIL_CLIENT_SECRET=${KETTTLE_EMAIL_CLIENT_SECRET}
+     - KETTTLE_EMAIL_REFRESH_TOKEN=${KETTTLE_EMAIL_REFRESH_TOKEN}
 
   # The mongodb instance
   mongo:
