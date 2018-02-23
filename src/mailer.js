@@ -1,6 +1,7 @@
 var nodemailer = require('nodemailer');
 var pug = require('pug');
 var db = require('./db');
+var logger = require('./logger');
 
 var transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -18,10 +19,10 @@ function _send(to, subject, html) {
         html
     };
     transporter.sendMail(options, (err, info) => {
-        if (err)
-            console.log(err)
-        else
-            console.log(info);
+        if (err) {
+            console.log(err, process.env.KETTTLE_EMAIL_PW);
+            logger.log({ level: 'error', message: 'Failed to send email for finished job', err, info, options });
+        }
     });
 }
 
@@ -41,7 +42,7 @@ function notify(job_id) {
             } 
         }, (err, result) => {
             if (err) {
-                console.log(err);
+                logger.log({ level: 'error', message: 'Faield to aggregate job info for email notification', job_id });
                 return;
             }
             var template = pug.renderFile('./templates/job_notification.pug', { job_id });

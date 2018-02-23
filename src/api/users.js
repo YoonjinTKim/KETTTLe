@@ -1,7 +1,5 @@
-
-//we want to add affiliation later
-
 var db = require('../db');
+var logger = require('../logger');
 
 module.exports = {
     listUsers: (req, res) => {
@@ -16,11 +14,10 @@ module.exports = {
         };
 
         db.users.findOne({ email: req.body.email } , (err, result) => {
-            if (!result) {
-                //insert this user into the database
-                db.users.insert(userData, (err, result) => {
-                    res.redirect('/');
-                });
+            if (err) {
+                logger.log({ level: 'error', message: 'Failed to find user during registration', userData, err });
+            } else if (!result) {
+                db.users.insert(userData, (err, result) => res.redirect('/'));
             } else {
                 res.send('That email is already associated with an account, please enter another email.');
             }

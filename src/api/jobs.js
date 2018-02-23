@@ -16,8 +16,13 @@ module.exports = {
 
     downloadJob: (req, res) => {
         db.jobs.findOne({ _id: db.ObjectId(req.params.jid) }, (err, result) => {
-            if (err || !result || result.status !== 'completed') {
-                res.send({ message: 'Job does not exist or has not been finished'});
+            if (err) {
+                logger.log({ level: 'error', message: 'Failed to find job for downloading', job_id: req.params.jid, err });
+                res.status(500).send('foo');
+                return;
+            } else if (!result || result.status !== 'completed') {
+                res.send({ message: 'Job does not exist or has not been finished' });
+                return;
             }
 
             arc.retrieveOutput(req.params.jid)
@@ -25,8 +30,7 @@ module.exports = {
                     res.download(`/tmp/${req.params.jid}.txt`);
                 })
                 .catch((err) => {
-                    // TODO: error logging
-                    console.log(err);
+                    logger.log({ level: 'error', message: 'Failed to retrieve job output from arc', job_id: req.params.jid, err });
                 });
         });
     },
@@ -35,7 +39,12 @@ module.exports = {
         db.jobs.update({ _id: db.ObjectId(req.params.jid) }, {
             $set: { status: 'completed' }
         }, (err, result) => {
-            res.send(result);
+            if (err) {
+                logger.log({ level: 'error', message: 'Failed to update job on completion', job_id: req.params.jid, err });
+                res.status(500);
+            } else {
+                res.send(result);
+            }
         });
 
         mailer.notify(req.params.jid);
@@ -44,6 +53,10 @@ module.exports = {
     submitJob: (req, res) => {
         var form = new formidable.IncomingForm();
         form.parse(req, (err, fields, { read_1, read_2 }) => {
+            if (err) {
+                logger.log({ level: 'error', message: 'Failed to parse form during job submission', err });
+                return;
+            }
             res.redirect('/jobs');
 
             var jobData = {
@@ -53,13 +66,16 @@ module.exports = {
             };
 
             db.jobs.insert(jobData, (err, result) => {
+                if (err) {
+                    logger.log({ level: 'error', message: 'Failed to create document for new job', err, jobData });
+                    return;
+                }
                 var jobId = result._id;
                 // Copy input to arc login node.
                 arc.copyFile(read_1.path, read_2.path, jobId)
                     .then(() => arc.runJob(jobId))
                     .catch((err) => {
-                        // TODO: add error logging
-                        console.log(err);
+                        logger.log({ level: 'error', message: 'Failed to submit job to arc', err });
                     });
             });
         });
