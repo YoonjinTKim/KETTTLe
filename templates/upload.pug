@@ -3,11 +3,23 @@ extends header
 block content
     h1 Upload
     form(action='/api/jobs' enctype='multipart/form-data' method='POST')
-        label Read 1: 
-        input(type='file' name='read_1')
-        br
-        label Read 2: 
-        input(type='file' name='read_2')
-        br
-        input(type='hidden' value=user_id name='user_id')
-        input(type='submit' value='Upload')
+        div(class='form-group')
+            label Read 1: 
+            input(class='form-control' type='file' name='read_1' required)
+            br
+
+            label Read 2: 
+            input(class='form-control' type='file' name='read_2' required)
+            br
+
+            label Reference Database
+            select(class='form-control' name='database' required)
+                option(value='NCBI') NCBI Database
+                option(value='NCBI_EUKARYOTIC') NCBI Eukaryotic Only Database
+                option(value='NCBI_PHAGE') NCBI Phage Only Database
+                option(value='JGI') JGI ("Uncovering Earth's Virome")
+                option(value='GLOBAL_OCEAN_VIROME') Global Ocean Virome
+            br
+
+            input(type='hidden' value=user_id name='user_id')
+            input(class='form-control' type='submit' value='Upload')

@@ -8,6 +8,8 @@ block content
             td status
             td output
             td visualization
+            td database
+            td qsub_id
             td last updated
         each job in jobs
             tr
@@ -21,4 +23,6 @@ block content
                 else
                     td -
                     td -
-                td #{job.updated_at}
+                td #{job.database}
+                td #{job.qsub_id}
+                td #{new Date(job.updated_at).toLocaleDateString()}

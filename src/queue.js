@@ -8,12 +8,12 @@ function Queue() {
     this.arcCounter = 0;
 }
 
-Queue.prototype.submit = function(job_id) {
+Queue.prototype.submit = function(jobData) {
     if (this.arcCounter < ARC_JOB_THRESHOLD) {
         this.arcCounter ++;
-        arc.runJob(job_id);
+        arc.runJob(jobData);
     } else {
-        this.array.push(job_id);
+        this.array.push(jobData);
     }
 }
 

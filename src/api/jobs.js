@@ -64,7 +64,8 @@ module.exports = {
             var jobData = {
                 updated_at: new Date(),
                 status: 'submitted',
-                user_id: req.user._id
+                user_id: req.user._id,
+                database: fields.database
             };
 
             db.jobs.insert(jobData, (err, result) => {
@@ -72,10 +73,10 @@ module.exports = {
                     logger.log({ level: 'error', message: 'Failed to create document for new job', err, jobData });
                     return;
                 }
-                var jobId = result._id;
+                jobData._id = result._id;
                 // Copy input to arc login node.
-                arc.copyFile(read_1.path, read_2.path, jobId)
-                    .then(() => req.jobQueue.submit(jobId))
+                arc.copyFile(read_1.path, read_2.path, result._id)
+                    .then(() => req.jobQueue.submit(jobData))
                     .catch((err) => {
                         logger.log({ level: 'error', message: 'Failed to submit job to arc', err });
                     });
