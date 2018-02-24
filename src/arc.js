@@ -23,7 +23,7 @@ module.exports = {
     retrieveOutput: (jobId) => {
         return new Promise((resolve, reject) => {
             // TODO: copy actual job specific output
-            exec(`scp ${process.env.ARC_USER}@newriver1.arc.vt.edu:${jobId}/FastViromeExplorer-final-sorted-abundance.tsv /tmp/${jobId}.txt`,
+            exec(`scp ${process.env.ARC_USER}@newriver1.arc.vt.edu:${jobId}/output.tar.gz /tmp/output_${jobId}.tar.gz`,
                 (err) => promiseHandler(err, resolve, reject)
             );
         });

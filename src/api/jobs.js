@@ -28,7 +28,7 @@ module.exports = {
 
             arc.retrieveOutput(req.params.jid)
                 .then((result) => {
-                    res.download(`/tmp/${req.params.jid}.txt`);
+                    res.download(`/tmp/output_${req.params.jid}.tar.gz`);
                 })
                 .catch((err) => {
                     logger.log({ level: 'error', message: 'Failed to retrieve job output from arc', job_id: req.params.jid, err });

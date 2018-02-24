@@ -15,8 +15,6 @@ Queue.prototype.submit = function(job_id) {
     } else {
         this.array.push(job_id);
     }
-
-    console.log(this.array, this.arcCounter);
 }
 
 Queue.prototype.runNext = function() {
