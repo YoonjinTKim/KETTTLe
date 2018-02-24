@@ -63,7 +63,7 @@ module.exports = {
 
             var jobData = {
                 updated_at: new Date(),
-                status: 'submitted',
+                status: 'waiting',
                 user_id: req.user._id,
                 database: fields.database
             };

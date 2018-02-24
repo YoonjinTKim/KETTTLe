@@ -1,15 +1,14 @@
 const arc = require('./arc');
 const logger = require('./logger');
 
-const ARC_JOB_THRESHOLD = 5;
-
 function Queue() {
     this.array = [];
     this.arcCounter = 0;
+    this.threshold = (process.env.NODE_ENV === 'production' ? arc.ARC_QUEUE.prod : arc.ARC_QUEUE.dev).threshold;
 }
 
 Queue.prototype.submit = function(jobData) {
-    if (this.arcCounter < ARC_JOB_THRESHOLD) {
+    if (this.arcCounter < this.threshold) {
         this.arcCounter ++;
         arc.runJob(jobData);
     } else {

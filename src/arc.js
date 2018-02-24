@@ -26,6 +26,17 @@ const REFERENCE_DB = {
     }
 };
 
+const ARC_QUEUE = {
+    prod: {
+        name: 'normal_q',
+        threshold: 6
+    },
+    dev: {
+        name: 'dev_q',
+        threshold: 1
+    }
+};
+
 function copyFile(read1, read2, pathname) {
     return new Promise((resolve, reject) => {
         exec(`
@@ -41,11 +52,15 @@ function copyFile(read1, read2, pathname) {
 function runJob(jobData) {
     let { _id, database } = jobData;
     let command = `ssh ${process.env.ARC_USER}@newriver1.arc.vt.edu "${_qsubCommand(_id, REFERENCE_DB[database])}"`;
-    exec(command, (err, stdout) => {
-        if (err)
-            logger.log({ level: 'error', message: 'Failed to run ssh command to start qsub job', err, command });
-        else
-            db.jobs.update({ _id: db.ObjectId(_id) }, { $set: { qsub_id: stdout.trim() } });
+    exec(command, (err, stdout, stderr) => {
+        if (err) {
+            logger.log({ level: 'error', message: 'Failed to run ssh command to start qsub job', err, stdout, stderr });
+        } else {
+            db.jobs.update({ _id: db.ObjectId(_id) }, { $set: {
+                qsub_id: stdout.trim(),
+                status: 'submitted'
+            }});
+        }
     });
 }
 
@@ -58,7 +73,8 @@ function retrieveOutput(jobId) {
 }
 
 function _qsubCommand(jobId, database) {
-    return `qsub -A cs4884s18 -q p100_dev_q -W group_list=newriver run_job.pbs -F \\"${_qsubArguments(jobId, database)}\\"`;
+    let queue = (process.env.NODE_ENV === 'production' ? ARC_QUEUE.prod : ARC_QUEUE.dev).name;
+    return `qsub -A cs4884s18 -q ${queue} -W group_list=newriver run_job.pbs -F \\"${_qsubArguments(jobId, database)}\\"`;
 }
 
 /**
@@ -79,6 +95,8 @@ function _promiseHandler(err, resolve, reject, result) {
 }
 
 module.exports = {
+    REFERENCE_DB,
+    ARC_QUEUE,
     copyFile,
     runJob,
     retrieveOutput
