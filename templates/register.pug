@@ -1,18 +1,19 @@
 extends header
 
 block content
-    h1 Register
-    form(action = '/api/users' method = 'POST')
-        label Email: 
-        input(type='email' name='email' autocomplete='username' required)
-        br
-        label Affiliation: 
-        input(type='text' name='affiliation' autocomplete='affiliation' required)
-        br
-        label Password:
-        input(id='password' type='password' name='password' autocomplete='new-password' required)
-        br
-        label Confirm Password:
-        input(id='confirmed_password' type='password' name='confirmed_password' autocomplete='new-password' required)
-        br
-        input(type='submit' value='Submit')
+    div(class='center wrapper')
+        h1 Register
+        form(action = '/api/users' method = 'POST')
+            input(type='email' name='email' autocomplete='username' placeholder='Email address' required)
+            br
+
+            input(type='text' name='affiliation' autocomplete='affiliation' placeholder='Affiliation' required)
+            br
+
+            input(id='password' type='password' name='password' autocomplete='new-password' placeholder='Password' required)
+            br
+
+            input(id='confirmed_password' type='password' name='confirmed_password' autocomplete='new-password' placeholder='Confirm Password' required)
+            br
+
+            button(class='btn btn-primary btn-block' type='submit') Register

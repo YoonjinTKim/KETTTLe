@@ -1,7 +1,7 @@
 doctype html  
 html(lang='en') 
     head
-        title KETTTLe - Online database for FastViromeExplorer
+        title Ketttle
         meta(charset='utf-8')
         meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
         meta(name='description' content='')
@@ -13,6 +13,7 @@ html(lang='en')
             integrity='sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm' 
             crossorigin='anonymous'
         )
+        link(href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet')
         script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js')
         script(
             src='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js'
@@ -29,23 +30,23 @@ html(lang='en')
                     span(class='navbar-toggler-icon')
                 div(class='collapse navbar-collapse' id='navbarResponsive')
                     ul(class='navbar-nav ml-auto')
-                        li(class='nav-item active')
-                            a(class='nav-link' href='/') Home
+                        li(class='nav-item')
+                            a(class='nav-link' + (home ? ' active' : '') href='/') Home
                                 span(class='sr-only') current
 
                         if logged_in
                             li(class='nav-item')
-                                a(class='nav-link' href='/upload') Upload
+                                a(class='nav-link' + (upload ? ' active' : '') href='/upload') Upload
 
                             li(class='nav-item')
-                                a(class='nav-link' href='/jobs') Jobs
+                                a(class='nav-link' + (jobslist ? ' active' : '') href='/jobs') Jobs
 
                             li(class='nav-item')
                                 a(class='nav-link' href='/api/users/logout') Logout
                         else
                             li(class='nav-item')
-                                a(class='nav-link' href='/login') Log In
+                                a(class='nav-link' + (login ? ' active' : '') href='/login') Log In
 
                             li(class='nav-item')
-                                a(class='nav-link' href='/register') Create Account
+                                a(class='nav-link' + (register ? ' active' : '') href='/register') Register
         block content
