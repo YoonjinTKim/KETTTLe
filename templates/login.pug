@@ -4,6 +4,9 @@ block content
     div(class='center wrapper')
         h1 Login
         form(action='/api/users/login' method='POST')
+            if failed
+                div(class='alert alert-danger')
+                  strong Invalid username or password
             input(type='email' name='email' placeholder='Email address' required)
             br
             input(type='password' name='password' placeholder='Password' required)

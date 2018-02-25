@@ -8,11 +8,10 @@ module.exports = {
 
     createUser: (req, res) => {
         if (req.body.password != req.body.confirmed_password) {
-            res.send({message: 'Passwords do not match'});
-            res.status(401).send('bar');
-            //need to display this for the client, might need client side
-            //javascript
+            res.redirect('/register?mismatch=true');
+            return;
         }
+
         var userData = {
             email: req.body.email,
             affiliation: req.body.affiliation,
@@ -20,12 +19,12 @@ module.exports = {
         };
 
         db.users.findOne({ email: req.body.email } , (err, result) => {
-            if (err) {
-                logger.log({ level: 'error', message: 'Failed to find user during registration', userData, err });
+            if (err || result) {
+                if (err)
+                    logger.log({ level: 'error', message: 'Failed to find user during registration', userData, err });
+                res.redirect('/register?exists=true');
             } else if (!result) {
                 db.users.insert(userData, (err, result) => res.redirect('/'));
-            } else {
-                res.send('That email is already associated with an account, please enter another email.');
             }
         });
     },

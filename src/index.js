@@ -52,7 +52,8 @@ app.use(session({
     secret: 'keyboard cat',
     resave: false,
     saveUninitialized: false,
-    store: new mongoStore({ url: process.env.MONGO_URL })
+    store: new mongoStore({ url: process.env.MONGO_URL }),
+    cookie: { maxAge: 1000 * 60 * 60 * 24 } // lifespan of a day
 }));
 app.use('/public', express.static(path.join(__dirname, '../public')));
 app.set('view engine', 'pug')
@@ -69,7 +70,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // requests for authentification
-app.post('/api/users/login', passport.authenticate('local', { failureRedirect: '/login' }), users.login);
+app.post('/api/users/login', passport.authenticate('local', { failureRedirect: '/login?failed=true' }), users.login);
 
 // All business related logic should be under the api route.
 app.use('/api', require('./api'));

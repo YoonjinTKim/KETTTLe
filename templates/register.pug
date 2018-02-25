@@ -4,6 +4,12 @@ block content
     div(class='center wrapper')
         h1 Register
         form(action = '/api/users' method = 'POST')
+            if exists
+                div(class='alert alert-danger')
+                  strong Account already exists, try another email address
+            else if mismatch
+                div(class='alert alert-danger')
+                  strong Confirmation password does not match
             input(type='email' name='email' autocomplete='username' placeholder='Email address' required)
             br
 

@@ -10,11 +10,20 @@ router.get('/', (req, res) => {
 });
 
 router.get('/login', (req, res) => {
-    res.render('login', { logged_in: !!req.user, login: true });
+    res.render('login', {
+        logged_in: !!req.user,
+        login: true,
+        failed: req.query.failed
+    });
 });
 
 router.get('/register', (req, res) => {
-    res.render('register', { logged_in: !!req.user, register: true });
+    res.render('register', {
+        logged_in: !!req.user,
+        register: true,
+        exists: req.query.exists,
+        mismatch: req.query.mismatch
+    });
 });
 
 // Authenticated routes.
