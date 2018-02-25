@@ -1,25 +1,30 @@
 extends header
 
 block content
-    h1 Upload
-    form(action='/api/jobs' enctype='multipart/form-data' method='POST')
-        div(class='form-group')
-            label Read 1: 
-            input(class='form-control' type='file' name='read_1' required)
-            br
+    div(class='container wrapper')
+        div(class='row')
+            div(class='col-lg-12 text-center')
+                h1 Upload a job
+                form(action='/api/jobs' enctype='multipart/form-data' method='POST')
+                    div(class='form-group')
+                        div(class='custom-file')
+                            input(class='custom-file-input' id='read_1' type='file' name='read_1' required)
+                            label(class='custom-file-label' for='read_1') Read 1
 
-            label Read 2: 
-            input(class='form-control' type='file' name='read_2' required)
-            br
+                    div(class='form-group')
+                        div(class='custom-file')
+                            input(class='custom-file-input' id='read_2' type='file' name='read_2' required)
+                            label(class='custom-file-label' for='read_2') Read 2
 
-            label Reference Database
-            select(class='form-control' name='database' required)
-                option(value='NCBI') NCBI Database
-                option(value='NCBI_EUKARYOTIC') NCBI Eukaryotic Only Database
-                option(value='NCBI_PHAGE') NCBI Phage Only Database
-                option(value='JGI') JGI ("Uncovering Earth's Virome")
-                option(value='GLOBAL_OCEAN_VIROME') Global Ocean Virome
-            br
+                    div(class='form-group')
+                        label Reference Database
+                        select(class='form-control' name='database' required)
+                            option(value='NCBI') NCBI Database
+                            option(value='NCBI_EUKARYOTIC') NCBI Eukaryotic Only Database
+                            option(value='NCBI_PHAGE') NCBI Phage Only Database
+                            option(value='JGI') JGI ("Uncovering Earth's Virome")
+                            option(value='GLOBAL_OCEAN_VIROME') Global Ocean Virome
 
-            input(type='hidden' value=user_id name='user_id')
-            input(class='form-control' type='submit' value='Upload')
+                    div(class='form-group')
+                        input(type='hidden' value=user_id name='user_id')
+                        input(class='form-control' type='submit' value='Upload')

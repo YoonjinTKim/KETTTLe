@@ -1,10 +1,11 @@
 body {
-    padding-top: 54px;
+    /* fixed nav bar width */
+    padding-top: 3.5rem;
     font-family: 'Open Sans', sans-serif;
 }
 
 form {
-    max-width: 350px;
+    max-width: 500px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -38,4 +39,10 @@ input {
     font-weight: 700
     margin-top: 0;
     margin-bottom: 0;
+}
+
+.footer {
+  padding: 2.5rem 0;
+  color: #999;
+  text-align: center;
 }

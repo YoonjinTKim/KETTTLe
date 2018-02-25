@@ -1,14 +1,17 @@
 extends header
 
 block content
-    div(class='center wrapper')
-        h1 Login
-        form(action='/api/users/login' method='POST')
-            if failed
-                div(class='alert alert-danger')
-                  strong Invalid username or password
-            input(type='email' name='email' placeholder='Email address' required)
-            br
-            input(type='password' name='password' placeholder='Password' required)
-            br
-            button(class='btn btn-primary btn-block' type='submit') Login
+    div(class='container wrapper')
+        div(class='row')
+            div(class='col-lg-12 text-center')
+                h1 Login
+                form(action='/api/users/login' method='POST')
+                    if failed
+                        div(class='alert alert-danger')
+                          strong Invalid username or password
+                    div(class='form-group')
+                        input(class='form-control' type='email' name='email' placeholder='Email address' required)
+                    div(class='form-group')
+                        input(class='form-control' type='password' name='password' placeholder='Password' required)
+                    div(class='form-group')
+                        button(class='btn btn-primary btn-block' type='submit') Login

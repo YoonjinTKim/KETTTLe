@@ -1,6 +1,33 @@
 extends header
 
 block content
-    div(class='center wrapper')
-        h1(class='center' id='home-header') Bioinformatics and Metagenomics pipeline
-        p Ketttle is an online tool for the FastViromeExplorer which is a pipeline for virus and phage identification and abundance profiling in metagenomic data
+    div(class='jumbotron')
+        div(class='container')
+            h1(class='display-3' id='home-header') Bioinformatics &amp; Metagenomics pipeline
+            p Ketttle is an online tool for the FastViromeExplorer which is a pipeline for virus and phage identification and abundance profiling in metagenomic data.
+
+    div(class='container')
+        div(class='row')
+            div(class='col-lg-12 text-center')
+                img(src='/public/icon.png' alt='ketttle icon')
+
+    div(class='container')
+        div(class='row')
+            div(class='col-lg-12 text-center')
+                h2(class='section-heading') Features
+                hr
+
+    div(class='container')
+        div(class='row')
+            div(class='col-md-4 text-center')
+                h3 Database Customization
+                p Upload your own reference database to be used for analysis
+            div(class='col-md-4 text-center')
+                h3 High Performance Computing
+                p Capable of analyzing large datasets
+            div(class='col-md-4 text-center')
+                h3 FastViromeExplorer
+                p Utilizes the algorithm described in the
+                    a(href='https://peerj.com/articles/4227/') research paper
+
+    footer(class='footer')
