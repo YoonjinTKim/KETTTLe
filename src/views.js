@@ -36,4 +36,11 @@ router.get('/jobs', loginMiddleware, (req, res) => {
     })
 });
 
+router.get('/job/:jid/visualization', loginMiddleware, (req, res) => {
+    // TODO: create visualization
+    res.render('visualization', {
+        logged_in: !!req.user,
+    })
+});
+
 module.exports = router;
