@@ -9,6 +9,12 @@ module.exports = {
     },
 
     createUser: (req, res) => {
+        if (req.body.password != req.body.confirmed_password) {
+            res.send({message: 'Passwords do not match'});
+            res.status(401).send('bar');
+            //need to display this for the client, might need client side
+            //javascript
+        }
         var userData = {
             email: req.body.email,
             affiliation: req.body.affiliation,
