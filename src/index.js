@@ -52,7 +52,7 @@ app.use(session({
     secret: 'keyboard cat',
     resave: false,
     saveUninitialized: false,
-    store: new mongoStore({ url: process.env.MONGO_URL }),
+    store: new mongoStore({ url: process.env.MONGO_URL || 'mongodb://localhost:27017/ketttle-db' }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 } // lifespan of a day
 }));
 app.use('/public', express.static(path.join(__dirname, '../public')));
