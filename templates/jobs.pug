@@ -1,28 +1,50 @@
 extends header
 
 block content
-    h1 Jobs
-    table(class='table table-hover')
-        tr
-            td id
-            td status
-            td output
-            td visualization
-            td database
-            td qsub_id
-            td last updated
-        each job in jobs
+    div(class='container wrapper')
+        h1 Jobs
+        table(class='table table-hover')
             tr
-                td #{job._id || '-'}
-                td #{job.status || '-'}
-                if job.status === 'completed'
-                    td 
-                        a(class='nav-link' href='/api/jobs/download/' + job._id) Download
-                    td 
-                        a(class='nav-link' href='/job/' + job._id + '/visualization') Visualize
+                td id
+                td status
+                td output
+                td visualization
+                td database
+                td qsub_id
+                td last updated
+            each job in jobs
+                tr
+                    td #{job._id || '-'}
+                    td #{job.status || '-'}
+                    if job.status === 'completed'
+                        td 
+                            a(class='nav-link' href='/api/jobs/download/' + job._id) Download
+                        td 
+                            a(class='nav-link' href='/job/' + job._id + '/visualization') Visualize
+                    else
+                        td -
+                        td -
+                    td #{job.database || '-'}
+                    td #{job.qsub_id ? job.qsub_id.split('.')[0] : '-'}
+                    td #{new Date(job.updated_at).toLocaleDateString()}
+        ul(class='pagination center-horizontal')
+            if Number(page) === 1
+                li(class='page-item disabled')
+                    a(class='page-link') Prev
+            else
+                li(class='page-item')
+                    a(class='page-link' href='/jobs?page=' + (Number(page) - 1)) Prev
+            each pageNum in pages
+                if pageNum === Number(page)
+                    li(class='page-item active')
+                        a(class='page-link' href='/jobs?page=' + pageNum) #{pageNum}
                 else
-                    td -
-                    td -
-                td #{job.database || '-'}
-                td #{job.qsub_id || '-'}
-                td #{new Date(job.updated_at).toLocaleDateString()}
+                    li(class='page-item')
+                        a(class='page-link' href='/jobs?page=' + pageNum) #{pageNum}
+            if Number(page) === Number(maxPages)
+                li(class='page-item disabled')
+                    a(class='page-link') Next
+
+            else
+                li(class='page-item')
+                    a(class='page-link' href='/jobs?page=' + (Number(page) + 1)) Next
