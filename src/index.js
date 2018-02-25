@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var passport = require('passport');
 var cookierparser = require('cookie-parser');
 var session = require('express-session');
+var mongoStore = require('connect-mongo')(session);
 
 var db = require('./db');
 var users = require('./api/users');
@@ -50,7 +51,8 @@ app.use(cookierparser());
 app.use(session({
     secret: 'keyboard cat',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    store: new mongoStore({ url: process.env.MONGO_URL })
 }));
 app.use('/public', express.static(path.join(__dirname, '../public')));
 app.set('view engine', 'pug')
