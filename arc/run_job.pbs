@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Arguments:
-# There are five arguments for the job:
 # 1. input read path
 # 2. input read path
 # 3. index path
 # 4. output path
 # 5. arc username
+# 6. genome length path
 
 # The script will outline the commands necessary to perform a FastViromeExplorer job.
 # There are two dependencies which FastViromeExplorer uses: kallisto and samtools.
@@ -24,9 +24,14 @@ cp -r $HOME/FastViromeExplorer/bin $WORK
 java -cp $WORK/bin FastViromeExplorer \
     -1 $HOME/$1 \
     -2 $HOME/$2 \
-    -i $HOME/$3 -o $4
+    -i $HOME/FastViromeExplorer/$3 \
+    -l $HOME/FastViromeExplorer/$6 \
+    -o $HOME/$4
 
 # ssh to the login node to send a request to the node server that the job is complete.
 # TODO: the curl url should be replaced with the production url.
 ssh $5@newriver1.arc.vt.edu \
     "curl https://7f6c927c.ngrok.io/api/jobs/finished/$4 -X POST"
+
+cd $HOME/$4
+tar -zcvf output.tar.gz FastViromeExplorer-final-sorted-abundance.tsv FastViromeExplorer-reads-mapped-sorted.sam

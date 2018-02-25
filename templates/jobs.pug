@@ -8,17 +8,21 @@ block content
             td status
             td output
             td visualization
+            td database
+            td qsub_id
             td last updated
         each job in jobs
             tr
-                td #{job._id}
-                td #{job.status}
+                td #{job._id || '-'}
+                td #{job.status || '-'}
                 if job.status === 'completed'
                     td 
                         a(class='nav-link' href='/api/jobs/download/' + job._id) Download
                     td 
-                        a(class='nav-link' href='#') Visualize
+                        a(class='nav-link' href='/job/' + job._id + '/visualization') Visualize
                 else
                     td -
                     td -
-                td #{job.updated_at}
+                td #{job.database || '-'}
+                td #{job.qsub_id || '-'}
+                td #{new Date(job.updated_at).toLocaleDateString()}

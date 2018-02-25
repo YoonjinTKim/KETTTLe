@@ -35,4 +35,6 @@ The node server requires a few environment variables to be setup. They are not i
 
 - MONGO_URL (automatically configured Docker)
 - ARC_USER (determines which arc account to use)
-- KETTTLE_EMAIL_PW (allows access to email)
+- KETTTLE_EMAIL_CLIENT_ID (email verification)
+- KETTTLE_EMAIL_CLIENT_SECRET (email verification)
+- KETTTLE_EMAIL_REFRESH_TOKEN (email verification)
