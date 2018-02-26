@@ -1,9 +1,9 @@
-var nodemailer = require('nodemailer');
-var pug = require('pug');
-var db = require('./db');
-var logger = require('./logger');
+const nodemailer = require('nodemailer');
+const pug = require('pug');
+const db = require('./db');
+const logger = require('./logger');
 
-var transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
         type: 'OAuth2',
@@ -15,7 +15,7 @@ var transporter = nodemailer.createTransport({
 });
 
 function _send(to, subject, html) {
-    var options = {
+    let options = {
         from: 'ketttlenotification@gmail.com',
         to,
         subject,
@@ -47,7 +47,13 @@ function notify(job_id) {
                 logger.log({ level: 'error', message: 'Faield to aggregate job info for email notification', job_id });
                 return;
             }
-            var template = pug.renderFile('./templates/job_notification.pug', { job_id });
+            // TODO: add prod url
+            let jobUrl = `http://localhost:3000/job/${job_id}/visualization`;
+            let template = pug.renderFile('./templates/job_notification.pug', { 
+                job_id,
+                job_url: jobUrl
+            });
+            console.log(template);
             _send(result[0].user[0].email, 'Your job has been finished', template);
         });
 }
