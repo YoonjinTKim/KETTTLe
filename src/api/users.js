@@ -24,7 +24,13 @@ module.exports = {
                     logger.log({ level: 'error', message: 'Failed to find user during registration', userData, err });
                 res.redirect('/register?exists=true');
             } else if (!result) {
-                db.users.insert(userData, (err, result) => res.redirect('/'));
+                db.users.insert(userData, (err, result) => {
+                    req.login({
+                        emai: userData.email,
+                        password: userData.password.split('').reverse().join(''),
+                        _id: result._id
+                    }, () => res.redirect('/'));
+                });
             }
         });
     },

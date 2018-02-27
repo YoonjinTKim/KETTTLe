@@ -31,14 +31,14 @@ passport.use(new Strategy({
 ));
 
 passport.serializeUser((user, cb) => {
-  cb(null, user._id);
+    cb(null, user._id);
 });
 
 passport.deserializeUser((_id, cb) => {
-  db.users.findOne({ _id: db.ObjectId(_id) }, (err, user) => {
-    if (err) { return cb(err); }
-    cb(null, user);
-  });
+    db.users.findOne({ _id: db.ObjectId(_id) }, (err, user) => {
+        if (err) { return cb(err); }
+        cb(null, user);
+    });
 });
 
 var app = express();
