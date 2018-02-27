@@ -53,7 +53,6 @@ function notify(job_id) {
                 job_id,
                 job_url: jobUrl
             });
-            console.log(template);
             _send(result[0].user[0].email, 'Your job has been finished', template);
         });
 }

@@ -49,7 +49,6 @@ module.exports = {
         });
 
         mailer.notify(req.params.jid);
-        req.jobQueue.runNext();
     },
 
     submitJob: (req, res) => {
@@ -76,7 +75,8 @@ module.exports = {
                 jobData._id = result._id;
                 // Copy input to arc login node.
                 arc.copyFile(read_1.path, read_2.path, result._id)
-                    .then(() => req.jobQueue.submit(jobData))
+                    .then(arc.getJobCount)
+                    .then((count) => arc.runOrWait(jobData, count))
                     .catch((err) => {
                         logger.log({ level: 'error', message: 'Failed to submit job to arc', err });
                     });

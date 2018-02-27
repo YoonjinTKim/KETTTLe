@@ -37,13 +37,16 @@ const ARC_QUEUE = {
     }
 };
 
+const sshUrl = `${process.env.ARC_USER}@newriver1.arc.vt.edu`;
+const queue = process.env.NODE_ENV === 'production' ? ARC_QUEUE.prod : ARC_QUEUE.dev;
+
 function copyFile(read1, read2, pathname) {
     return new Promise((resolve, reject) => {
         exec(`
             mkdir /tmp/${pathname} &&
             mv ${read1} /tmp/${pathname}/read_1.fq &&
             mv ${read2} /tmp/${pathname}/read_2.fq &&
-            scp -v -r /tmp/${pathname} ${process.env.ARC_USER}@newriver1.arc.vt.edu:`,
+            scp -v -r /tmp/${pathname} ${sshUrl}:`,
             (err) => _promiseHandler(err, resolve, reject)
         );
     });
@@ -51,7 +54,11 @@ function copyFile(read1, read2, pathname) {
 
 function runJob(jobData) {
     let { _id, database } = jobData;
-    let command = `ssh ${process.env.ARC_USER}@newriver1.arc.vt.edu "${_qsubCommand(_id, REFERENCE_DB[database])}"`;
+    if (!REFERENCE_DB[database]) {
+        logger.log({ level: 'error', message: 'Reference database not found' });
+        return
+    }
+    let command = `ssh ${sshUrl} "${_qsubCommand(_id, REFERENCE_DB[database])}"`;
     exec(command, (err, stdout, stderr) => {
         if (err) {
             logger.log({ level: 'error', message: 'Failed to run ssh command to start qsub job', err, stdout, stderr });
@@ -66,15 +73,50 @@ function runJob(jobData) {
 
 function retrieveOutput(jobId) {
     return new Promise((resolve, reject) => {
-        exec(`scp ${process.env.ARC_USER}@newriver1.arc.vt.edu:${jobId}/output.tar.gz /tmp/output_${jobId}.tar.gz`,
+        exec(`scp ${sshUrl}:${jobId}/output.tar.gz /tmp/output_${jobId}.tar.gz`,
             (err) => _promiseHandler(err, resolve, reject)
         );
     });
 }
 
+function getJobCount() {
+    return new Promise((resolve, reject) => {
+        exec(`ssh ${sshUrl} "qstat | grep ${process.env.ARC_USER} | wc -l"`,
+            (err, stdout) => {
+                let count = 0;
+                try {
+                    count = Number(stdout);
+                } catch(e) {
+                    return _promiseHandler(e, resolve, reject);
+                }
+                _promiseHandler(err, resolve, reject, count);
+            }
+        );
+    });
+}
+
+function findAndRunJob() {
+    return new Promise((resolve, reject) => {
+        db.jobs.findOne({ status: 'waiting' }, (err, job) => {
+            if (err || !job) {
+                if (err)
+                    logger.log({ level: 'error', message: 'Failed to find job to be run after a different job finished', err });
+                return resolve();
+            }
+            resolve(job);
+        })
+    });
+}
+
+function runOrWait(jobData, count) {
+    if (count < queue.threshold) {
+        findAndRunJob(runJob)
+    }
+}
+
 function _qsubCommand(jobId, database) {
-    let queue = (process.env.NODE_ENV === 'production' ? ARC_QUEUE.prod : ARC_QUEUE.dev).name;
-    return `qsub -A cs4884s18 -q ${queue} -W group_list=newriver run_job.pbs -F \\"${_qsubArguments(jobId, database)}\\"`;
+    let name = queue.name;
+    return `qsub -A cs4884s18 -q ${name} -W group_list=newriver run_job.pbs -F \\"${_qsubArguments(jobId, database)}\\"`;
 }
 
 /**
@@ -99,5 +141,7 @@ module.exports = {
     ARC_QUEUE,
     copyFile,
     runJob,
-    retrieveOutput
+    retrieveOutput,
+    getJobCount,
+    runOrWait
 };
