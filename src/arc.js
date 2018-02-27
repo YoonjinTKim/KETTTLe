@@ -82,14 +82,18 @@ function retrieveOutput(jobId) {
 function getJobCount() {
     return new Promise((resolve, reject) => {
         exec(`ssh ${sshUrl} "qstat | grep ${process.env.ARC_USER} | wc -l"`,
-            (err, stdout) => {
+            (err, stdout, stderr) => {
+                if (stderr) return reject(stderr);
+                if (err) return reject(err);
+
                 let count = 0;
                 try {
                     count = Number(stdout);
                 } catch(e) {
-                    return _promiseHandler(e, resolve, reject);
+                    return reject(e);
                 }
-                _promiseHandler(err, resolve, reject, count);
+
+                resolve(count);
             }
         );
     });
@@ -99,8 +103,10 @@ function findAndRunJob() {
     return new Promise((resolve, reject) => {
         db.jobs.findOne({ status: 'waiting' }, (err, job) => {
             if (err || !job) {
-                if (err)
+                if (err) {
                     logger.log({ level: 'error', message: 'Failed to find job to be run after a different job finished', err });
+                    return reject(err);
+                }
                 return resolve();
             }
             resolve(job);
