@@ -87,7 +87,8 @@ router.get('/job/:jid/visualization', loginMiddleware, (req, res) => {
             .catch((err) => {
                 logger.log({ level: 'error', message: err.message, job });
                 res.render('visualization', {
-                    logged_in: !!req.user
+                    logged_in: !!req.user,
+                    job
                 });
                 arc.remove(`/tmp/output_${req.params.jid}.tar.gz`)
             });
