@@ -40,14 +40,16 @@ function _parse(data) {
             let window = dom.window;
             let dombody = window.document.body;
             let body = d3.select(dombody);
-            data = d3dsv.tsvParse(data);
+            data = d3dsv.tsvParse(data)
             let maxHeight = data.length ? Number(data[0].EstimatedAbundance) : 250
+            data = data.filter((elem) => elem.EstimatedAbundance && Number(elem.EstimatedAbundance) > maxHeight * 0.2);
+            let maxWidth = data.length;
 
             let svg = body
                 .append('svg')
                 .attr('x', 0)
                 .attr('y', 0)
-                .attr('width', 5000)
+                .attr('width', maxWidth * 50)
                 .attr('height', maxHeight)
                 .attr('xmlns', 'http://www.w3.org/2000/svg');
 
@@ -110,7 +112,7 @@ function _parse(data) {
                 .attr('dy', '.75em')
             .text((d) => d.EstimatedAbundance)
                 .style('fill', 'white')
-                .style('font-size', '15px')
+                .style('font-size', '8px')
                 .style('font-weight', '400')
                 .style('text-anchor', 'middle');    
             resolve(body.html());
