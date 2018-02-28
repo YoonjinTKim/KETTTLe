@@ -83,7 +83,6 @@ function getJobCount() {
     return new Promise((resolve, reject) => {
         exec(`ssh ${sshUrl} "qstat | grep ${process.env.ARC_USER} | wc -l"`,
             (err, stdout, stderr) => {
-                if (stderr) return reject(stderr);
                 if (err) return reject(err);
 
                 let count = 0;

@@ -3,3 +3,26 @@ extends header
 block content
     div(class='center wrapper')
         h1 Visualization
+        if !job
+            p Failed to load job data
+        else
+            table(class='table')
+                tbody
+                    tr
+                        td(align='right') Id
+                        td(align='left') #{job._id}
+                    tr
+                        td(align='right') Status
+                        td(align='left') #{job.status}
+                    tr
+                        td(align='right') Output
+                        td(align='left') #[a(href='/api/jobs/download/' + job._id) Download]
+                    tr
+                        td(align='right') Database Name
+                        td(align='left') #{job.database}
+                    tr
+                        td(align='right') Qsub Id
+                        td(align='left') #{job.qsub_id}
+                    tr
+                        td(align='right') Last Updated At
+                        td(align='left') #{job.updated_at}

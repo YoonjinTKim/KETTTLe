@@ -72,9 +72,12 @@ router.get('/jobs', loginMiddleware, (req, res) => {
 
 router.get('/job/:jid/visualization', loginMiddleware, (req, res) => {
     // TODO: create visualization
-    res.render('visualization', {
-        logged_in: !!req.user,
-    })
+    db.jobs.findOne({ _id: db.ObjectId(req.params.jid) }, (err, job) => {
+        res.render('visualization', {
+            logged_in: !!req.user,
+            job
+        });
+    });
 });
 
 module.exports = router;
