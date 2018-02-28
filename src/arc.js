@@ -46,35 +46,53 @@ function copyFile(read1, read2, pathname) {
             mkdir /tmp/${pathname} &&
             mv ${read1} /tmp/${pathname}/read_1.fq &&
             mv ${read2} /tmp/${pathname}/read_2.fq &&
-            scp -v -r /tmp/${pathname} ${sshUrl}:`,
+            scp -v -r /tmp/${pathname} ${sshUrl}: &&
+            rm /tmp/${pathname}/read_1.fq /tmp/${pathname}/read_2.fq &&
+            rm -r /tmp/${pathname}`,
             (err) => _promiseHandler(err, resolve, reject)
         );
     });
 }
 
 function runJob(jobData) {
-    let { _id, database } = jobData;
-    if (!REFERENCE_DB[database]) {
-        logger.log({ level: 'error', message: 'Reference database not found' });
-        return
-    }
-    let command = `ssh ${sshUrl} "${_qsubCommand(_id, REFERENCE_DB[database])}"`;
-    exec(command, (err, stdout, stderr) => {
-        if (err) {
-            logger.log({ level: 'error', message: 'Failed to run ssh command to start qsub job', err, stdout, stderr });
-        } else {
-            db.jobs.update({ _id: db.ObjectId(_id) }, { $set: {
-                qsub_id: stdout.trim(),
-                status: 'submitted'
-            }});
+    return new Promise((resolve, reject) => {
+        // Sanity check.
+        if (!jobData) return resolve(false);
+        let { _id, database } = jobData;
+        if (!REFERENCE_DB[database]) {
+            logger.log({ level: 'error', message: 'Reference database not found' });
+            return resolve(false);
         }
+        let command = `ssh ${sshUrl} "${_qsubCommand(_id, REFERENCE_DB[database])}"`;
+        exec(command, (err, stdout, stderr) => {
+            if (err) {
+                logger.log({ level: 'error', message: 'Failed to run ssh command to start qsub job', err, stdout, stderr });
+                reject(err);
+            } else {
+                db.jobs.update({ _id: db.ObjectId(_id) }, { $set: {
+                    qsub_id: stdout.trim(),
+                    status: 'submitted'
+                }});
+                resolve(true);
+            }
+        });
     });
 }
 
 function retrieveOutput(jobId) {
+    let output = `/tmp/output_${jobId}.tar.gz`;
     return new Promise((resolve, reject) => {
-        exec(`scp ${sshUrl}:${jobId}/output.tar.gz /tmp/output_${jobId}.tar.gz`,
-            (err) => _promiseHandler(err, resolve, reject)
+        exec(`scp ${sshUrl}:${jobId}/output.tar.gz ${output}`,
+            (err) => _promiseHandler(err, resolve, reject, output)
+        );
+    });
+}
+
+function retrieveAbundance(jobId) {
+    let output = `/tmp/abundance_${jobId}.tar.gz`;
+    return new Promise((resolve, reject) => {
+        exec(`scp ${sshUrl}:${jobId}/abundance.tar.gz ${output}`,
+            (err) => _promiseHandler(err, resolve, reject, output)
         );
     });
 }
@@ -113,10 +131,17 @@ function findAndRunJob() {
     });
 }
 
-function runOrWait(jobData, count) {
+function runOrWait(count, jobData) {
     if (count < queue.threshold) {
-        findAndRunJob(runJob)
+        if (jobData)
+            return runJob(jobData)
+        else
+            return findAndRunJob().then(runJob)
     }
+}
+
+function remove(path) {
+    exec(`rm ${path}`);
 }
 
 function _qsubCommand(jobId, database) {
@@ -147,6 +172,8 @@ module.exports = {
     copyFile,
     runJob,
     retrieveOutput,
+    retrieveAbundance,
     getJobCount,
-    runOrWait
+    runOrWait,
+    remove
 };

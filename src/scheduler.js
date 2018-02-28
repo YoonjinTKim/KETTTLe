@@ -9,7 +9,9 @@ const logger = require('./logger');
  */
 const interval = process.env.NODE_ENV === 'production' ? '0 10 * * * *' : '60 * * * * *'
 const job = cron.job(interval, () => {
-    arc.getJobCount(arc.runOrWait)
+    arc.getJobCount()
+        .then(arc.runOrWait)
+        .then((status) => status && logger.log({ level: 'info', message: 'Scheduler has submitted a background job' }))
         .catch((err) => logger.log({ level: 'error', message: err.message }));
 });
 job.start();

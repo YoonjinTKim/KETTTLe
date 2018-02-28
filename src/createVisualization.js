@@ -4,9 +4,22 @@ const d3scale = require('d3-scale');
 const d3axis = require('d3-axis');
 const fs = require('fs');
 const { JSDOM } = require('jsdom');
+const exec = require('child_process').exec;
 
-function create(input) {
-    return _readFile(input).then(_parse);
+function create(input, job_id) {
+    return _uncompress(input, job_id)
+        .then(_readFile)
+        .then(_parse);
+}
+
+function _uncompress(compressed, job_id) {
+    return new Promise((resolve, reject) => {
+        exec(`tar -xvf ${compressed}`, (err, st1, st2) => {
+            if (err) 
+                return reject(err);
+            resolve(`output_${job_id}.tsv`);
+        });
+    });
 }
 
 function _readFile(file) {
@@ -56,7 +69,7 @@ function _parse(data) {
                 .attr('transform', `translate(${margin.left},${margin.top})`);
 
             if (data.length <= 0) {
-                g.append('text').attr('y', 50).attr('font-size', 50).text('There was no abundance data produced.');
+                g.append('text').attr('y', 50).attr('font-size', 20).text('There was no abundance data produced.');
                 return resolve(body.html());
             }
 

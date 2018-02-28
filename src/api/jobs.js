@@ -27,11 +27,13 @@ module.exports = {
             }
 
             arc.retrieveOutput(req.params.jid)
-                .then((result) => {
-                    res.download(`/tmp/output_${req.params.jid}.tar.gz`);
+                .then((path) => {
+                    res.download(path);
+                    arc.remove(`/tmp/output_${req.params.jid}.tar.gz`)
                 })
                 .catch((err) => {
                     logger.log({ level: 'error', message: err.message, job_id: req.params.jid });
+                    arc.remove(`/tmp/output_${req.params.jid}.tar.gz`)
                 });
         });
     },
@@ -76,7 +78,7 @@ module.exports = {
                 // Copy input to arc login node.
                 arc.copyFile(read_1.path, read_2.path, result._id)
                     .then(arc.getJobCount)
-                    .then((count) => arc.runOrWait(jobData, count))
+                    .then((count) => arc.runOrWait(count, jobData))
                     .catch((err) => {
                         logger.log({ level: 'error', message: err.message });
                     });

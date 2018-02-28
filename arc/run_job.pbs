@@ -34,7 +34,7 @@ ssh $5@newriver1.arc.vt.edu \
     "curl https://7f6c927c.ngrok.io/api/jobs/finished/$4 -X POST"
 
 cd $HOME/$4
-mv FastViromeExplorer-final-sorted-abundance.tsv output.tsv
-mv FastViromeExplorer-reads-mapped-sorted.sam output.sam
-tar -zcvf output.tar.gz output.tsv output.sam
-tar -zcvf abundance.tar.gz output.tsv
+mv FastViromeExplorer-final-sorted-abundance.tsv output_$4.tsv
+mv FastViromeExplorer-reads-mapped-sorted.sam output_$4.sam
+tar -zcvf output.tar.gz output_$4.tsv output_$4.sam
+tar -zcvf abundance.tar.gz output_$4.tsv

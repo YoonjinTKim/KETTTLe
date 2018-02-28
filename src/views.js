@@ -73,12 +73,24 @@ router.get('/jobs', loginMiddleware, (req, res) => {
 });
 
 router.get('/job/:jid/visualization', loginMiddleware, (req, res) => {
-    // TODO: create visualization
     db.jobs.findOne({ _id: db.ObjectId(req.params.jid) }, (err, job) => {
-        res.render('visualization', {
-            logged_in: !!req.user,
-            job
-        });
+        arc.retrieveAbundance(req.params.jid)
+            .then((file) => visualization.create(file, req.params.jid))
+            .then((visualizationHTML) => {
+                res.render('visualization', {
+                    logged_in: !!req.user,
+                    job,
+                    visualizationHTML
+                });
+                arc.remove(`/tmp/output_${req.params.jid}.tar.gz`)
+            })
+            .catch((err) => {
+                logger.log({ level: 'error', message: err.message, job });
+                res.render('visualization', {
+                    logged_in: !!req.user
+                });
+                arc.remove(`/tmp/output_${req.params.jid}.tar.gz`)
+            });
     });
 });
 

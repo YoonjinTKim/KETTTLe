@@ -2,10 +2,10 @@ extends header
 
 block content
     div(class='center wrapper')
-        h1 Visualization
         if !job
             p Failed to load job data
         else
+            h2 Job Data
             table(class='table')
                 tbody
                     tr
@@ -26,3 +26,5 @@ block content
                     tr
                         td(align='right') Last Updated At
                         td(align='left') #{job.updated_at}
+            h2 Abundance Graph
+                p!= visualizationHTML
