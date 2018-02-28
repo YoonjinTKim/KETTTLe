@@ -21,6 +21,9 @@ module load jdk/1.8.0
 # Copy the java binaries to $WORK for fast I/O operations.
 cp -r $HOME/FastViromeExplorer/bin $WORK
 
+ssh $5@newriver1.arc.vt.edu \
+    "curl https://7f6c927c.ngrok.io/api/jobs/started/$4 -X POST"
+
 java -cp $WORK/bin FastViromeExplorer \
     -1 $HOME/$1 \
     -2 $HOME/$2 \

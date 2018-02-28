@@ -53,20 +53,42 @@ module.exports = {
         mailer.notify(req.params.jid);
     },
 
+    startJob: (req, res) => {
+        db.jobs.update({ _id: db.ObjectId(req.params.jid) }, {
+            $set: { status: 'running' }
+        }, (err, result) => {
+            if (err) {
+                logger.log({ level: 'error', message: 'Failed to update job on start', job_id: req.params.jid, err });
+                res.status(500);
+            } else {
+                res.send(result);
+            }
+        });
+    },
+
     submitJob: (req, res) => {
         var form = new formidable.IncomingForm();
-        form.parse(req, (err, fields, { read_1, read_2 }) => {
+        form.parse(req, (err, fields, files) => {
             if (err) {
                 logger.log({ level: 'error', message: 'Failed to parse form during job submission', err });
                 return;
             }
             res.redirect('/jobs');
 
+            let read_1 = files.read_1;
+            let read_2 = files.read_2;
+            let read_count = 1;
+
+            if (read_2.size > 0) {
+                read_count ++;
+            }
+
             var jobData = {
                 updated_at: new Date(),
                 status: 'waiting',
                 user_id: req.user._id,
-                database: fields.database
+                database: fields.database,
+                read_count
             };
 
             db.jobs.insert(jobData, (err, result) => {

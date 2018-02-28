@@ -58,12 +58,18 @@ function runJob(jobData) {
     return new Promise((resolve, reject) => {
         // Sanity check.
         if (!jobData) return resolve(false);
-        let { _id, database } = jobData;
+        let { _id, database, read_count } = jobData;
         if (!REFERENCE_DB[database]) {
             logger.log({ level: 'error', message: 'Reference database not found' });
             return resolve(false);
         }
-        let command = `ssh ${sshUrl} "${_qsubCommand(_id, REFERENCE_DB[database])}"`;
+        let command;
+        if (read_count === 1 || read_count === 2) {
+            command = `ssh ${sshUrl} "${_qsubCommand(_id, REFERENCE_DB[database], read_count)}"`;
+        } else {
+            logger.log({ level: 'error', message: 'Job data has invalid read count' });
+            return resolve(false);
+        }
         exec(command, (err, stdout, stderr) => {
             if (err) {
                 logger.log({ level: 'error', message: 'Failed to run ssh command to start qsub job', err, stdout, stderr });
@@ -144,18 +150,20 @@ function remove(path) {
     exec(`rm ${path}`);
 }
 
-function _qsubCommand(jobId, database) {
+function _qsubCommand(jobId, database, count) {
     let name = queue.name;
-    return `qsub -A cs4884s18 -q ${name} -W group_list=newriver run_job.pbs -F \\"${_qsubArguments(jobId, database)}\\"`;
+    return `qsub -A cs4884s18 -q ${name} -W group_list=newriver run_job_${count}.pbs -F \\"${_qsubArguments(jobId, database, count)}\\"`;
 }
 
 /**
  * The arguments that are returned in this function must match the arguments listed in `run_job.pbs`
  */
-function _qsubArguments(jobId, { index, genome }) {
+function _qsubArguments(jobId, { index, genome }, count) {
     let read1 = `${jobId}/read_1.fq`;
     let read2 = `${jobId}/read_2.fq`;
-    let args = [ read1, read2, index, jobId, process.env.ARC_USER, genome ];
+    let reads = [ read1 ];
+    if (count === 2) reads.push(read2);
+    let args = [ ...reads, index, jobId, process.env.ARC_USER, genome ];
     return args.join(' ');
 }
 
