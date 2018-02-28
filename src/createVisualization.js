@@ -42,7 +42,6 @@ function _parse(data) {
             let body = d3.select(dombody);
             data = d3dsv.tsvParse(data)
             let maxHeight = data.length ? Number(data[0].EstimatedAbundance) : 250
-            data = data.filter((elem) => elem.EstimatedAbundance && Number(elem.EstimatedAbundance) > maxHeight * 0.2);
             let maxWidth = data.length;
 
             let svg = body
