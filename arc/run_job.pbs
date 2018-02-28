@@ -37,3 +37,4 @@ cd $HOME/$4
 mv FastViromeExplorer-final-sorted-abundance.tsv output.tsv
 mv FastViromeExplorer-reads-mapped-sorted.sam output.sam
 tar -zcvf output.tar.gz output.tsv output.sam
+tar -zcvf abundance.tar.gz output.tsv

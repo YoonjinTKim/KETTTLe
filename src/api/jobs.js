@@ -31,7 +31,7 @@ module.exports = {
                     res.download(`/tmp/output_${req.params.jid}.tar.gz`);
                 })
                 .catch((err) => {
-                    logger.log({ level: 'error', message: 'Failed to retrieve job output from arc', job_id: req.params.jid, err });
+                    logger.log({ level: 'error', message: err.message, job_id: req.params.jid });
                 });
         });
     },
@@ -78,7 +78,7 @@ module.exports = {
                     .then(arc.getJobCount)
                     .then((count) => arc.runOrWait(jobData, count))
                     .catch((err) => {
-                        logger.log({ level: 'error', message: 'Failed to submit job to arc', err });
+                        logger.log({ level: 'error', message: err.message });
                     });
             });
         });

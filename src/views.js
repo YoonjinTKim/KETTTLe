@@ -1,9 +1,11 @@
-var express = require('express');
-var ensureLogin = require('connect-ensure-login')
-var db = require('./db');
-var router = express.Router();
-
-var loginMiddleware = ensureLogin.ensureLoggedIn();
+const express = require('express');
+const ensureLogin = require('connect-ensure-login')
+const db = require('./db');
+const visualization = require('./createVisualization');
+const logger = require('./logger');
+const arc = require('./arc');
+const router = express.Router();
+const loginMiddleware = ensureLogin.ensureLoggedIn();
 
 router.get('/', (req, res) => {
     res.render('home', { logged_in: !!req.user, home: true });

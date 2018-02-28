@@ -10,6 +10,6 @@ const logger = require('./logger');
 const interval = process.env.NODE_ENV === 'production' ? '0 10 * * * *' : '60 * * * * *'
 const job = cron.job(interval, () => {
     arc.getJobCount(arc.runOrWait)
-        .catch((err) => logger.log({ level: 'error', message: 'Job scheduler failed', err }));
+        .catch((err) => logger.log({ level: 'error', message: err.message }));
 });
 job.start();
