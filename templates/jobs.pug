@@ -2,7 +2,7 @@ extends header
 
 block content
     div(class='container wrapper')
-        h1 Jobs
+        h1(style='background-image:url(/public/dna.jpg); color:white; width:100%; height:50px; text-indent:10px; font-weight:bold') Jobs
         table(class='table table-hover')
             tr
                 td id
@@ -10,6 +10,7 @@ block content
                 td output
                 td visualization
                 td database
+                td read_count
                 td qsub_id
                 td last updated
             each job in jobs
@@ -17,14 +18,13 @@ block content
                     td #{job._id || '-'}
                     td #{job.status || '-'}
                     if job.status === 'completed'
-                        td 
-                            a(class='nav-link' href='/api/jobs/download/' + job._id) Download
-                        td 
-                            a(class='nav-link' href='/job/' + job._id + '/visualization') Visualize
+                        td #[a(href='/api/jobs/download/' + job._id) Download]
+                        td #[a(href='/job/' + job._id + '/visualization') Visualize]
                     else
                         td -
                         td -
                     td #{job.database || '-'}
+                    td #{job.read_count || '-'}
                     td #{job.qsub_id ? job.qsub_id.split('.')[0] : '-'}
                     td #{new Date(job.updated_at).toLocaleDateString()}
         ul(class='pagination center-horizontal')

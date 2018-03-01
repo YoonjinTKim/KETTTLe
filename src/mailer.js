@@ -43,8 +43,8 @@ function notify(job_id) {
                'user.email': 1 
             } 
         }, (err, result) => {
-            if (err) {
-                logger.log({ level: 'error', message: 'Faield to aggregate job info for email notification', job_id });
+            if (err || !result || !result[0] || !!result[0].user || !!result[0].user[0]) {
+                logger.log({ level: 'error', message: 'Failed to aggregate job info for email notification', job_id });
                 return;
             }
             // TODO: add prod url

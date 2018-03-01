@@ -1,10 +1,10 @@
 extends header
 
 block content
-    div(class='jumbotron')
+    div(class='jumbotron' style='background-image:url(/public/dna.jpg)')
         div(class='container')
-            h1(class='display-3' id='home-header') Bioinformatics &amp; Metagenomics pipeline
-            p Ketttle is an online tool for the FastViromeExplorer which is a pipeline for virus and phage identification and abundance profiling in metagenomic data.
+            h1(class='display-3' align ='center' id='home-header' style='color:white; font-weight:bold') Bioinformatics &amp; Metagenomics pipeline
+            <p align="center" style='color:white'> Ketttle is an online tool for the FastViromeExplorer which is a pipeline for virus <br>and phage identification and abundance profiling in metagenomic data.</p>
 
     div(class='container')
         div(class='row')
@@ -14,19 +14,19 @@ block content
     div(class='container')
         div(class='row')
             div(class='col-lg-12 text-center')
-                h2(class='section-heading') Features
+                h2(class='section-heading' style='font-weight:bold; font-size:50px') Features
                 hr
 
     div(class='container')
         div(class='row')
-            div(class='col-md-4 text-center')
+            div(class='col-md-4 text-center' style='color:#4eb9dd')
                 h3 Database Customization
                 p Upload your own reference database to be used for analysis
-            div(class='col-md-4 text-center')
+            div(class='col-md-4 text-center' style='color:#4eb9dd')
                 h3 High Performance Computing
                 p Capable of analyzing large datasets
-            div(class='col-md-4 text-center')
+            div(class='col-md-4 text-center' style='color:#4eb9dd')
                 h3 FastViromeExplorer
                 p Utilizes the algorithm described in the #[a(href='https://peerj.com/articles/4227/') research paper]
 
-    footer(class='footer')
+    footer(class='footer' style='background-color:black')

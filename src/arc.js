@@ -46,35 +46,59 @@ function copyFile(read1, read2, pathname) {
             mkdir /tmp/${pathname} &&
             mv ${read1} /tmp/${pathname}/read_1.fq &&
             mv ${read2} /tmp/${pathname}/read_2.fq &&
-            scp -v -r /tmp/${pathname} ${sshUrl}:`,
+            scp -v -r /tmp/${pathname} ${sshUrl}: &&
+            rm /tmp/${pathname}/read_1.fq /tmp/${pathname}/read_2.fq &&
+            rm -r /tmp/${pathname}`,
             (err) => _promiseHandler(err, resolve, reject)
         );
     });
 }
 
 function runJob(jobData) {
-    let { _id, database } = jobData;
-    if (!REFERENCE_DB[database]) {
-        logger.log({ level: 'error', message: 'Reference database not found' });
-        return
-    }
-    let command = `ssh ${sshUrl} "${_qsubCommand(_id, REFERENCE_DB[database])}"`;
-    exec(command, (err, stdout, stderr) => {
-        if (err) {
-            logger.log({ level: 'error', message: 'Failed to run ssh command to start qsub job', err, stdout, stderr });
-        } else {
-            db.jobs.update({ _id: db.ObjectId(_id) }, { $set: {
-                qsub_id: stdout.trim(),
-                status: 'submitted'
-            }});
+    return new Promise((resolve, reject) => {
+        // Sanity check.
+        if (!jobData) return resolve(false);
+        let { _id, database, read_count } = jobData;
+        if (!REFERENCE_DB[database]) {
+            logger.log({ level: 'error', message: 'Reference database not found' });
+            return resolve(false);
         }
+        let command;
+        if (read_count === 1 || read_count === 2) {
+            command = `ssh ${sshUrl} "${_qsubCommand(_id, REFERENCE_DB[database], read_count)}"`;
+        } else {
+            logger.log({ level: 'error', message: 'Job data has invalid read count' });
+            return resolve(false);
+        }
+        exec(command, (err, stdout, stderr) => {
+            if (err) {
+                logger.log({ level: 'error', message: 'Failed to run ssh command to start qsub job', err, stdout, stderr });
+                reject(err);
+            } else {
+                db.jobs.update({ _id: db.ObjectId(_id) }, { $set: {
+                    qsub_id: stdout.trim(),
+                    status: 'submitted'
+                }});
+                resolve(true);
+            }
+        });
     });
 }
 
 function retrieveOutput(jobId) {
+    let output = `/tmp/output_${jobId}.tar.gz`;
     return new Promise((resolve, reject) => {
-        exec(`scp ${sshUrl}:${jobId}/output.tar.gz /tmp/output_${jobId}.tar.gz`,
-            (err) => _promiseHandler(err, resolve, reject)
+        exec(`scp ${sshUrl}:${jobId}/output.tar.gz ${output}`,
+            (err) => _promiseHandler(err, resolve, reject, output)
+        );
+    });
+}
+
+function retrieveAbundance(jobId) {
+    let output = `/tmp/abundance_${jobId}.tar.gz`;
+    return new Promise((resolve, reject) => {
+        exec(`scp ${sshUrl}:${jobId}/abundance.tar.gz ${output}`,
+            (err) => _promiseHandler(err, resolve, reject, output)
         );
     });
 }
@@ -82,14 +106,17 @@ function retrieveOutput(jobId) {
 function getJobCount() {
     return new Promise((resolve, reject) => {
         exec(`ssh ${sshUrl} "qstat | grep ${process.env.ARC_USER} | wc -l"`,
-            (err, stdout) => {
+            (err, stdout, stderr) => {
+                if (err) return reject(err);
+
                 let count = 0;
                 try {
                     count = Number(stdout);
                 } catch(e) {
-                    return _promiseHandler(e, resolve, reject);
+                    return reject(e);
                 }
-                _promiseHandler(err, resolve, reject, count);
+
+                resolve(count);
             }
         );
     });
@@ -99,8 +126,10 @@ function findAndRunJob() {
     return new Promise((resolve, reject) => {
         db.jobs.findOne({ status: 'waiting' }, (err, job) => {
             if (err || !job) {
-                if (err)
+                if (err) {
                     logger.log({ level: 'error', message: 'Failed to find job to be run after a different job finished', err });
+                    return reject(err);
+                }
                 return resolve();
             }
             resolve(job);
@@ -108,24 +137,33 @@ function findAndRunJob() {
     });
 }
 
-function runOrWait(jobData, count) {
+function runOrWait(count, jobData) {
     if (count < queue.threshold) {
-        findAndRunJob(runJob)
+        if (jobData)
+            return runJob(jobData)
+        else
+            return findAndRunJob().then(runJob)
     }
 }
 
-function _qsubCommand(jobId, database) {
+function remove(path) {
+    exec(`rm ${path}`);
+}
+
+function _qsubCommand(jobId, database, count) {
     let name = queue.name;
-    return `qsub -A cs4884s18 -q ${name} -W group_list=newriver run_job.pbs -F \\"${_qsubArguments(jobId, database)}\\"`;
+    return `qsub -A cs4884s18 -q ${name} -W group_list=newriver run_job_${count}.pbs -F \\"${_qsubArguments(jobId, database, count)}\\"`;
 }
 
 /**
  * The arguments that are returned in this function must match the arguments listed in `run_job.pbs`
  */
-function _qsubArguments(jobId, { index, genome }) {
+function _qsubArguments(jobId, { index, genome }, count) {
     let read1 = `${jobId}/read_1.fq`;
     let read2 = `${jobId}/read_2.fq`;
-    let args = [ read1, read2, index, jobId, process.env.ARC_USER, genome ];
+    let reads = [ read1 ];
+    if (count === 2) reads.push(read2);
+    let args = [ ...reads, index, jobId, process.env.ARC_USER, genome ];
     return args.join(' ');
 }
 
@@ -142,6 +180,8 @@ module.exports = {
     copyFile,
     runJob,
     retrieveOutput,
+    retrieveAbundance,
     getJobCount,
-    runOrWait
+    runOrWait,
+    remove
 };

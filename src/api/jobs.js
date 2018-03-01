@@ -27,11 +27,13 @@ module.exports = {
             }
 
             arc.retrieveOutput(req.params.jid)
-                .then((result) => {
-                    res.download(`/tmp/output_${req.params.jid}.tar.gz`);
+                .then((path) => {
+                    res.download(path);
+                    arc.remove(`/tmp/output_${req.params.jid}.tar.gz`)
                 })
                 .catch((err) => {
-                    logger.log({ level: 'error', message: 'Failed to retrieve job output from arc', job_id: req.params.jid, err });
+                    logger.log({ level: 'error', message: err.message, job_id: req.params.jid });
+                    arc.remove(`/tmp/output_${req.params.jid}.tar.gz`)
                 });
         });
     },
@@ -51,20 +53,42 @@ module.exports = {
         mailer.notify(req.params.jid);
     },
 
+    startJob: (req, res) => {
+        db.jobs.update({ _id: db.ObjectId(req.params.jid) }, {
+            $set: { status: 'running' }
+        }, (err, result) => {
+            if (err) {
+                logger.log({ level: 'error', message: 'Failed to update job on start', job_id: req.params.jid, err });
+                res.status(500);
+            } else {
+                res.send(result);
+            }
+        });
+    },
+
     submitJob: (req, res) => {
         var form = new formidable.IncomingForm();
-        form.parse(req, (err, fields, { read_1, read_2 }) => {
+        form.parse(req, (err, fields, files) => {
             if (err) {
                 logger.log({ level: 'error', message: 'Failed to parse form during job submission', err });
                 return;
             }
             res.redirect('/jobs');
 
+            let read_1 = files.read_1;
+            let read_2 = files.read_2;
+            let read_count = 1;
+
+            if (read_2.size > 0) {
+                read_count ++;
+            }
+
             var jobData = {
                 updated_at: new Date(),
                 status: 'waiting',
                 user_id: req.user._id,
-                database: fields.database
+                database: fields.database,
+                read_count
             };
 
             db.jobs.insert(jobData, (err, result) => {
@@ -76,9 +100,9 @@ module.exports = {
                 // Copy input to arc login node.
                 arc.copyFile(read_1.path, read_2.path, result._id)
                     .then(arc.getJobCount)
-                    .then((count) => arc.runOrWait(jobData, count))
+                    .then((count) => arc.runOrWait(count, jobData))
                     .catch((err) => {
-                        logger.log({ level: 'error', message: 'Failed to submit job to arc', err });
+                        logger.log({ level: 'error', message: err.message });
                     });
             });
         });

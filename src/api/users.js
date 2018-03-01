@@ -25,7 +25,13 @@ module.exports = {
                 res.redirect('/register?exists=true');
                 return;
             } else if (!result) {
-                db.users.insert(userData, (err, result) => res.redirect('/'));
+                db.users.insert(userData, (err, result) => {
+                    req.login({
+                        emai: userData.email,
+                        password: userData.password.split('').reverse().join(''),
+                        _id: result._id
+                    }, () => res.redirect('/'));
+                });
             }
         });
     },

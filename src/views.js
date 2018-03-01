@@ -1,9 +1,11 @@
-var express = require('express');
-var ensureLogin = require('connect-ensure-login')
-var db = require('./db');
-var router = express.Router();
-
-var loginMiddleware = ensureLogin.ensureLoggedIn();
+const express = require('express');
+const ensureLogin = require('connect-ensure-login')
+const db = require('./db');
+const visualization = require('./createVisualization');
+const logger = require('./logger');
+const arc = require('./arc');
+const router = express.Router();
+const loginMiddleware = ensureLogin.ensureLoggedIn();
 
 router.get('/', (req, res) => {
     res.render('home', { logged_in: !!req.user, home: true });
@@ -71,10 +73,26 @@ router.get('/jobs', loginMiddleware, (req, res) => {
 });
 
 router.get('/job/:jid/visualization', loginMiddleware, (req, res) => {
-    // TODO: create visualization
-    res.render('visualization', {
-        logged_in: !!req.user,
-    })
+    db.jobs.findOne({ _id: db.ObjectId(req.params.jid) }, (err, job) => {
+        arc.retrieveAbundance(req.params.jid)
+            .then((file) => visualization.create(file, req.params.jid))
+            .then((visualizationHTML) => {
+                res.render('visualization', {
+                    logged_in: !!req.user,
+                    job,
+                    visualizationHTML
+                });
+                arc.remove(`/tmp/output_${req.params.jid}.tar.gz`)
+            })
+            .catch((err) => {
+                logger.log({ level: 'error', message: err.message, job });
+                res.render('visualization', {
+                    logged_in: !!req.user,
+                    job
+                });
+                arc.remove(`/tmp/output_${req.params.jid}.tar.gz`)
+            });
+    });
 });
 
 module.exports = router;
