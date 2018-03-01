@@ -23,6 +23,7 @@ module.exports = {
                 if (err)
                     logger.log({ level: 'error', message: 'Failed to find user during registration', userData, err });
                 res.redirect('/register?exists=true');
+                return;
             } else if (!result) {
                 db.users.insert(userData, (err, result) => res.redirect('/'));
             }
