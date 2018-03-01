@@ -1,6 +1,8 @@
 var db = require('../db');
 var logger = require('../logger');
 
+var bcrypt = require('bcrypt-nodejs');
+
 module.exports = {
     listUsers: (req, res) => {
         db.users.find((err, results) => res.send(results));
@@ -12,10 +14,11 @@ module.exports = {
             return;
         }
 
+        var hash = bcrypt.hashSync(req.body.password);
         var userData = {
             email: req.body.email,
             affiliation: req.body.affiliation,
-            password: req.body.password.split('').reverse().join('')
+            password: hash
         };
 
         db.users.findOne({ email: req.body.email } , (err, result) => {
@@ -28,7 +31,7 @@ module.exports = {
                 db.users.insert(userData, (err, result) => {
                     req.login({
                         emai: userData.email,
-                        password: userData.password.split('').reverse().join(''),
+                        password: req.body.password,
                         _id: result._id
                     }, () => res.redirect('/'));
                 });
