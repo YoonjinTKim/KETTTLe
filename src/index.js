@@ -44,6 +44,14 @@ passport.deserializeUser((_id, cb) => {
 
 var app = express();
 
+app.use((req, res, next) => {
+    try {
+        next();
+    } catch(err) {
+        res.render('error')
+    }
+});
+
 // include necessary app middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
