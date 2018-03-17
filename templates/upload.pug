@@ -1,7 +1,7 @@
 extends header
 
 block content
-    div(class='container wrapper')
+    .wrapper
         div(class='row')
             div(class='col-lg-12 text-center')
                 h1(style='font-weight:bold') Upload a job
@@ -28,4 +28,3 @@ block content
                     div(class='form-group')
                         input(type='hidden' value=user_id name='user_id')
                         input(class='form-control' type='submit' value='Upload')
-    footer(class='footer' style='background-image:url(/public/dna.jpg);')
