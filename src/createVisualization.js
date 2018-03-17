@@ -41,8 +41,8 @@ function _parse(data) {
             let dombody = window.document.body;
             let body = d3.select(dombody);
             data = d3dsv.tsvParse(data)
-            let maxHeight = data.length ? Number(data[0].EstimatedAbundance) : 250
-            let maxWidth = data.length;
+            let maxHeight = data.length ? Number(data[0].EstimatedAbundance) : 250;
+            let maxWidth = data.length || 500;
 
             let margin = { top: 20, right: 20, bottom: 250, left: 75 };
             let svg = body
@@ -61,9 +61,9 @@ function _parse(data) {
                 .rangeRound([0, width])
                 .padding(0.1)
                 .domain(data.map((d) => d['#VirusIdentifier']));
-            var y = d3scale.scaleLinear()
-                .rangeRound([height, 0])
-                .domain([0, maxHeight]);
+            var y = d3scale.scaleLog()
+                .domain([1, maxHeight])
+                .rangeRound([height, 0]);
             var dy = maxHeight - height;
 
             var g = svg.append('g')
@@ -100,8 +100,8 @@ function _parse(data) {
                 .enter().append('rect')
                     .attr('class', 'bar')
                     .attr('x', (d) => x(d['#VirusIdentifier']))
-                    .attr('y', (d) => maxHeight - d.EstimatedAbundance)
-                    .attr('height', (d) => d.EstimatedAbundance - dy)
+                    .attr('y', (d) => y(d.EstimatedAbundance))
+                    .attr('height', (d) => height - y(d.EstimatedAbundance))
                     .attr('width', x.bandwidth())
                     .attr('fill', 'blue');
 
@@ -112,11 +112,11 @@ function _parse(data) {
                 .append('text')
                 .attr('class','label')
                 .attr('x', ((d) => x(d['#VirusIdentifier']) + x.bandwidth()/2))
-                .attr('y', (d) => maxHeight - d.EstimatedAbundance + 2)
+                .attr('y', (d) => y(d.EstimatedAbundance) + 4)
                 .attr('dy', '.75em')
-            .text((d) => d.EstimatedAbundance)
+            .text((d) => parseInt(d.EstimatedAbundance))
                 .style('fill', 'white')
-                .style('font-size', '8px')
+                .style('font-size', '12px')
                 .style('font-weight', '400')
                 .style('text-anchor', 'middle');    
             resolve(body.html());
