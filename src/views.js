@@ -85,7 +85,7 @@ router.get('/job/:jid/visualization', loginMiddleware, (req, res) => {
                 arc.remove(`/tmp/output_${req.params.jid}.tar.gz`)
             })
             .catch((err) => {
-                logger.log({ level: 'error', message: err.message, job });
+                logger.log({ level: 'error', message: err.message, job, view: 'job visualization' });
                 res.render('visualization', {
                     logged_in: !!req.user,
                     job
@@ -93,6 +93,22 @@ router.get('/job/:jid/visualization', loginMiddleware, (req, res) => {
                 arc.remove(`/tmp/output_${req.params.jid}.tar.gz`)
             });
     });
+});
+
+router.get('/jobs/compare', loginMiddleware, (req, res) => {
+    let jobIds = Object.keys(req.query);
+    let promises = jobIds.map((jid) => arc.retrieveAbundance(jid).then(visualization.readFile))
+    Promise.all(promises).then((data) => visualization.compare(data, jobIds))
+        .then((visualizationHTML) => {
+            res.render('comparison', { 
+                logged_in: !!req.user,
+                visualizationHTML
+            });
+        })
+        .catch((err) => {
+            logger.log({ level: 'error', message: err.message, view: 'job comparison' });
+            res.render('comparison', { logged_in: !!req.user });
+        });
 });
 
 module.exports = router;

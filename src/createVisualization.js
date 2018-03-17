@@ -6,9 +6,11 @@ const fs = require('fs');
 const { JSDOM } = require('jsdom');
 const exec = require('child_process').exec;
 
+const colors = ['#3366cc', '#dc3912', '#ff9900', '#109618', '#990099', '#0099c6', '#dd4477', '#66aa00', '#b82e2e', '#316395', '#994499', '#22aa99', '#aaaa11', '#6633cc', '#e67300', '#8b0707', '#651067', '#329262', '#5574a6', '#3b3eac'];
+
 function create(input, job_id) {
     return _uncompress(input, job_id)
-        .then(_readFile)
+        .then(readFile)
         .then(_parse);
 }
 
@@ -22,7 +24,7 @@ function _uncompress(compressed, job_id) {
     });
 }
 
-function _readFile(file) {
+function readFile(file) {
     return new Promise((resolve, reject) => {
         fs.readFile(file, 'utf8', (err, data) => {
             if (err)
@@ -64,7 +66,6 @@ function _parse(data) {
             var y = d3scale.scaleLog()
                 .domain([1, maxHeight])
                 .rangeRound([height, 0]);
-            var dy = maxHeight - height;
 
             var g = svg.append('g')
                 .attr('transform', `translate(${margin.left},${margin.top})`);
@@ -126,6 +127,100 @@ function _parse(data) {
     });
 }
 
+function compare(arr, jobIds) {
+    return new Promise((resolve, reject) => {
+        try {
+            let dom = new JSDOM();
+            let window = dom.window;
+            let dombody = window.document.body;
+            let body = d3.select(dombody);
+            let data = arr.map((f) => d3dsv.tsvParse(f));
+            let maxXValue = 0;
+            let maxYValue = 0;
+            let minYValue = Number.MAX_SAFE_INTEGER;
+
+            // Add the x value to each data point (it is represented by its index in the list).
+            data.forEach((list) => {
+                list.forEach((element, index) => {
+                    element.x = index + 1; 
+                    minYValue = Math.min(minYValue, element.EstimatedAbundance);
+                    maxYValue = Math.max(maxYValue, element.EstimatedAbundance);
+                });
+                maxXValue = Math.max(maxXValue, list.length);
+            });
+
+            let margin = { top: 20, right: 20, bottom: 50, left: 50 };
+            let width = 600 - margin.left - margin.right;
+            let height = 600 - margin.top - margin.bottom;
+            let svg = body
+                .append('svg')
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .attr('xmlns', 'http://www.w3.org/2000/svg');
+
+            let y = d3scale.scaleLog()
+                .range([height, 0])
+                .domain([minYValue, maxYValue]);
+
+            let x = d3scale.scaleLinear()
+                .range([0, width])
+                .domain([1, maxXValue])
+
+            let g = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            // Add all the lines to the plot.
+            data.forEach((list, index) => {
+                let valueline = d3.line()
+                    .x((d) => x(d.x))
+                    .y((d) => y(Number(d.EstimatedAbundance)));
+                g.append('path')
+                    .data([list])
+                    .attr('fill', 'none')
+                    .attr('stroke', colors[index])
+                    .attr('class', 'line')
+                    .attr('d', valueline);
+            });
+
+            g.append('g')
+                .attr('class', 'axis axis--y')
+                .call(d3axis.axisLeft(y))
+
+            g.append('g')
+                .attr('class', 'axis axis--x')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3axis.axisBottom(x).ticks(Math.ceil(maxXValue / 10)))
+
+            // Add the legend.
+            let legend = g.append('g')
+                .attr('class', 'legend')
+                .attr('transform', 'translate(375,20)')
+
+            let legendRow = legend.selectAll('g').data(jobIds)
+                .enter()
+                .append('g')
+                    .attr('transform', (d, i) => `translate(0, ${i * 20})`)
+            legendRow.append('text')
+                    .attr('x', 10)
+                    .style('font-size', '12px')
+                    .attr('y', 5)
+                    .text((d) => d)
+            legendRow.append('path')
+                    .attr('d', d3.symbol().type(d3.symbolCircle))
+                    .attr('fill', (d, i) => colors[i])
+
+
+            resolve(body.html());
+        } catch(err) {
+            reject(err);
+        }
+    });
+}
+
 module.exports = {
-	create
+	create,
+    readFile,
+    compare
 };
