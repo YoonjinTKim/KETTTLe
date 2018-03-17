@@ -31,6 +31,7 @@
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "pug": "^2.0.0-rc.4",
-    "winston": "^3.0.0-rc1"
+    "winston": "^3.0.0-rc1",
+    "bcrypt-nodejs": "^0.0.3"
   }
 }

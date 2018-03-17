@@ -5,6 +5,7 @@ var passport = require('passport');
 var cookierparser = require('cookie-parser');
 var session = require('express-session');
 var mongoStore = require('connect-mongo')(session);
+var bcrypt = require('bcrypt-nodejs');
 
 var db = require('./db');
 var users = require('./api/users');
@@ -24,7 +25,7 @@ passport.use(new Strategy({
         db.users.findOne({ email: email }, (err, user) => {
             if (err) { return done(err); }
             if (!user) { return done(null, false); }
-            if (user.password.split('').reverse().join('') != password) { return done(null, false); }
+            if (!bcrypt.compareSync(password, user.password) ) { return done(null, false); }
             return done(null, user);
         });
     }
