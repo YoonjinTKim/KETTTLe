@@ -31,11 +31,6 @@ input {
     vertical-align:middle;
 }
 
-.center-horizontal {
-    width: 50%;
-    margin: 0 auto;
-}
-
 .wrapper {
     min-height: 100%;
     padding: 20px;
@@ -59,4 +54,8 @@ input {
 
 .color-light-blue {
    color:#4eb9dd 
+}
+
+.pagination {
+   justify-content: center;
 }
