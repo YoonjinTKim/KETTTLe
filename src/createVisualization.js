@@ -44,18 +44,18 @@ function _parse(data) {
             let maxHeight = data.length ? Number(data[0].EstimatedAbundance) : 250
             let maxWidth = data.length;
 
+            let margin = { top: 20, right: 20, bottom: 250, left: 75 };
             let svg = body
                 .append('svg')
                 .attr('x', 0)
                 .attr('y', 0)
-                .attr('width', maxWidth * 50)
-                .attr('height', maxHeight)
+                .attr('width', (maxWidth * 50) + margin.left)
+                .attr('height', 600 + margin.bottom)
                 .attr('xmlns', 'http://www.w3.org/2000/svg');
 
             // set spacing variables
-            var margin = { top: 20, right: 20, bottom: 100, left: 40 },
-                width = +svg.attr('width') - margin.left - margin.right,
-                height = +svg.attr('height') - margin.top - margin.bottom;
+            var width = +svg.attr('width') - margin.left - margin.right;
+            var height = +svg.attr('height') - margin.top - margin.bottom;
 
             var x = d3scale.scaleBand()
                 .rangeRound([0, width])
@@ -70,7 +70,11 @@ function _parse(data) {
                 .attr('transform', `translate(${margin.left},${margin.top})`);
 
             if (data.length <= 0) {
-                g.append('text').attr('y', 50).attr('font-size', 20).text('There was no abundance data produced.');
+                g.append('text')
+                    .attr('y', 50)
+                    .attr('x', 375)
+                    .attr('font-size', 20)
+                    .text('There is no abundance data');
                 return resolve(body.html());
             }
 
@@ -84,6 +88,7 @@ function _parse(data) {
                     .attr('dx', '-.8em')
                     .attr('dy', '.15em')
                     .attr('transform', 'rotate(-65)');
+
             // add y axis        
             g.append('g')
                 .attr('class', 'axis axis--y')
