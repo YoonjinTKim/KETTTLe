@@ -6,7 +6,11 @@ const fs = require('fs');
 const { JSDOM } = require('jsdom');
 const exec = require('child_process').exec;
 
-const colors = ['#3366cc', '#dc3912', '#ff9900', '#109618', '#990099', '#0099c6', '#dd4477', '#66aa00', '#b82e2e', '#316395', '#994499', '#22aa99', '#aaaa11', '#6633cc', '#e67300', '#8b0707', '#651067', '#329262', '#5574a6', '#3b3eac'];
+// Shades of colors in groups of 3
+const colors = [ '#3182bd','#6baed6','#9ecae1','#e6550d','#fd8d3c','#fdae6b','#31a354','#74c476','#a1d99b','#636363','#969696','#bdbdbd','#393b79','#5254a3','#6b6ecf','#637939','#8ca252','#b5cf6b','#8c6d31','#bd9e39','#e7ba52','#843c39','#ad494a','#d6616b','#756bb1','#9e9ac8','#bcbddc','#7b4173','#a55194','#ce6dbd' ]
+const TOP_N_SAMPLES = 10;
+const IDENTIFIER = '#VirusIdentifier';
+const NAME = 'VirusName';
 
 function create(input, job_id) {
     return _uncompress(input, job_id)
@@ -42,7 +46,7 @@ function _parse(data) {
             let window = dom.window;
             let dombody = window.document.body;
             let body = d3.select(dombody);
-            data = d3dsv.tsvParse(data)
+            data = d3dsv.tsvParse(data).slice(0, TOP_N_SAMPLES);
             let maxHeight = data.length ? Number(data[0].EstimatedAbundance) : 250;
             let maxWidth = data.length || 500;
 
@@ -135,22 +139,34 @@ function compare(arr, jobIds) {
             let dombody = window.document.body;
             let body = d3.select(dombody);
             let data = arr.map((f) => d3dsv.tsvParse(f));
-            let maxXValue = 0;
-            let maxYValue = 0;
-            let minYValue = Number.MAX_SAFE_INTEGER;
 
-            // Add the x value to each data point (it is represented by its index in the list).
-            data.forEach((list) => {
-                list.forEach((element, index) => {
-                    element.x = index + 1; 
-                    minYValue = Math.min(minYValue, element.EstimatedAbundance);
-                    maxYValue = Math.max(maxYValue, element.EstimatedAbundance);
+            let viruses = {};
+            let result = [];
+
+            function getVirusName(virus) {
+                return virus[ virus[NAME] === 'N/A' ? IDENTIFIER : NAME ];
+            }
+
+            data.forEach((list, index) => {
+                let total = 0;
+                result.push({ id: jobIds[index] });
+                list = list.slice(0, TOP_N_SAMPLES);
+                list.forEach((element) => {
+                    viruses[getVirusName(element)] = 0;
+                    total += Number(element.EstimatedAbundance);
                 });
-                maxXValue = Math.max(maxXValue, list.length);
+                list.forEach((element) => {
+                    let name = getVirusName(element);
+                    result[index][name] = Number(element.EstimatedAbundance) / total;
+                    viruses[name] = Math.max(viruses[name], result[index][name]);
+                });
             });
 
-            let margin = { top: 20, right: 20, bottom: 50, left: 50 };
-            let width = 600 - margin.left - margin.right;
+            let virusNames = Object.keys(viruses).sort((a, b) => viruses[a] - viruses[b]);
+            data = result;
+
+            let margin = { top: 20, right: 400, bottom: 50, left: 50 };
+            let width = 1250 - margin.left - margin.right;
             let height = 600 - margin.top - margin.bottom;
             let svg = body
                 .append('svg')
@@ -160,56 +176,72 @@ function compare(arr, jobIds) {
                 .attr('height', height + margin.top + margin.bottom)
                 .attr('xmlns', 'http://www.w3.org/2000/svg');
 
-            let y = d3scale.scaleLog()
-                .range([height, 0])
-                .domain([minYValue, maxYValue]);
+            let x = d3.scaleBand()
+                .rangeRound([0, width])
+                .padding(0.4)
+                .align(0.3)
+                .domain(jobIds);
 
-            let x = d3scale.scaleLinear()
-                .range([0, width])
-                .domain([1, maxXValue])
+            let y = d3.scaleLinear()
+                .rangeRound([height, 0])
+                .domain([0, 1])
+                .nice();
+
+            let z = d3.scaleOrdinal(colors).domain(virusNames);
+            let stack = d3.stack();
 
             let g = svg.append('g')
                 .attr('transform', `translate(${margin.left},${margin.top})`);
 
-            // Add all the lines to the plot.
-            data.forEach((list, index) => {
-                let valueline = d3.line()
-                    .x((d) => x(d.x))
-                    .y((d) => y(Number(d.EstimatedAbundance)));
-                g.append('path')
-                    .data([list])
-                    .attr('fill', 'none')
-                    .attr('stroke', colors[index])
-                    .attr('class', 'line')
-                    .attr('d', valueline);
-            });
+             g.selectAll('.serie')
+                .data(stack.keys(virusNames)(data))
+                .enter().append('g')
+                .attr('class', 'serie')
+                .attr('fill', (d) => z(d.key))
+                .selectAll('rect')
+                .data((d) => d)
+                .enter().append('rect')
+                .attr('x', (d) => x(d.data.id))
+                .attr('y', (d) => isNaN(d[1]) ? 0 : y(d[1]))
+                .attr('height', (d) => isNaN(d[0]) || isNaN(d[1]) ? 0 : y(d[0]) - y(d[1]))
+                .attr('width', x.bandwidth());
 
-            g.append('g')
-                .attr('class', 'axis axis--y')
-                .call(d3axis.axisLeft(y))
 
             g.append('g')
                 .attr('class', 'axis axis--x')
                 .attr('transform', `translate(0,${height})`)
-                .call(d3axis.axisBottom(x).ticks(Math.ceil(maxXValue / 10)))
+                .call(d3.axisBottom(x));
 
-            // Add the legend.
-            let legend = g.append('g')
+            g.append('g')
+                .attr('class', 'axis axis--y')
+                .call(d3.axisLeft(y).ticks(10, 's').tickFormat(d3.format('.0%')))
+                .append('text')
+                .attr('x', 2)
+                .attr('y', y(y.ticks(10).pop()))
+                .attr('dy', '0.35em')
+                .attr('text-anchor', 'start')
+                .attr('fill', '#000')
+
+            var legend = g.selectAll('.legend')
+                .data(virusNames)
+                .enter().append('g')
                 .attr('class', 'legend')
-                .attr('transform', 'translate(375,20)')
+                .attr('transform', (d, i) => `translate(0,${i * 20})`)
+                .style('font', '6px sans-serif !important');
 
-            let legendRow = legend.selectAll('g').data(jobIds)
-                .enter()
-                .append('g')
-                    .attr('transform', (d, i) => `translate(0, ${i * 20})`)
-            legendRow.append('text')
-                    .attr('x', 10)
-                    .style('font-size', '12px')
-                    .attr('y', 5)
-                    .text((d) => d)
-            legendRow.append('path')
-                    .attr('d', d3.symbol().type(d3.symbolCircle))
-                    .attr('fill', (d, i) => colors[i])
+            legend.append('rect')
+                .attr('x', width + 18)
+                .attr('width', 18)
+                .attr('height', 18)
+                .attr('fill', z);
+
+            legend.append('text')
+                .attr('x', width + 44)
+                .attr('y', 9)
+                .attr('dy', '.35em')
+                .attr('text-anchor', 'start')
+                .style('font', '6px sans-serif !important')
+                .text((d) => d);
 
 
             resolve(body.html());

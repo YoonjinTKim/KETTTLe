@@ -24,6 +24,8 @@ input {
 .footer {
     background-color: #343a40!important;
     height: 100px;
+    margin-top:10px;
+    position: relative;
 }
 
 .center {
