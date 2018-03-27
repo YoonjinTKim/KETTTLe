@@ -7,8 +7,8 @@ const { JSDOM } = require('jsdom');
 const exec = require('child_process').exec;
 
 // Shades of colors in groups of 3
-const colors = [ '#3182bd','#6baed6','#9ecae1','#e6550d','#fd8d3c','#fdae6b','#31a354','#74c476','#a1d99b','#636363','#969696','#bdbdbd','#393b79','#5254a3','#6b6ecf','#637939','#8ca252','#b5cf6b','#8c6d31','#bd9e39','#e7ba52','#843c39','#ad494a','#d6616b','#756bb1','#9e9ac8','#bcbddc','#7b4173','#a55194','#ce6dbd' ]
-const TOP_N_SAMPLES = 10;
+const colors = [ '#3182bd','#6baed6','#9ecae1','#e6550d','#fd8d3c','#fdae6b','#31a354','#74c476','#a1d99b','#636363','#969696','#393b79','#5254a3','#6b6ecf','#637939','#8ca252','#b5cf6b','#8c6d31','#bd9e39','#e7ba52','#843c39','#ad494a','#d6616b','#756bb1','#9e9ac8','#7b4173','#a55194','#ce6dbd', '#000000' ]
+const TOP_N_SAMPLES = 20;
 const IDENTIFIER = '#VirusIdentifier';
 const NAME = 'VirusName';
 
@@ -131,7 +131,7 @@ function _parse(data) {
     });
 }
 
-function compare(arr, jobIds) {
+function compare(arr, jobs) {
     return new Promise((resolve, reject) => {
         try {
             let dom = new JSDOM();
@@ -142,6 +142,9 @@ function compare(arr, jobIds) {
 
             let viruses = {};
             let result = [];
+            let jobNames = [];
+            let indexedVirusNames = {};
+            jobs.forEach((job) => jobNames.push(job.name));
 
             function getVirusName(virus) {
                 return virus[ virus[NAME] === 'N/A' ? IDENTIFIER : NAME ];
@@ -149,7 +152,7 @@ function compare(arr, jobIds) {
 
             data.forEach((list, index) => {
                 let total = 0;
-                result.push({ id: jobIds[index] });
+                result.push({ name: jobNames[index] });
                 list = list.slice(0, TOP_N_SAMPLES);
                 list.forEach((element) => {
                     viruses[getVirusName(element)] = 0;
@@ -158,16 +161,41 @@ function compare(arr, jobIds) {
                 list.forEach((element) => {
                     let name = getVirusName(element);
                     result[index][name] = Number(element.EstimatedAbundance) / total;
-                    viruses[name] = Math.max(viruses[name], result[index][name]);
+                    viruses[name] += result[index][name]
                 });
             });
 
-            let virusNames = Object.keys(viruses).sort((a, b) => viruses[a] - viruses[b]);
+            // Sort virus names and only include top N values.
+            let virusNames = Object.keys(viruses)
+                .sort((a, b) => viruses[b] - viruses[a])
+                .slice(0, TOP_N_SAMPLES);
+
+            virusNames = ['Other'].concat(virusNames);
+
+            // Index the virus names for quick lookup.
+            virusNames.forEach((v) => indexedVirusNames[v] = 1);
+
+            // Add 'other' bar stack to all bars.
+            // This is because we trim the data to the top N samples which
+            // causes a lot of missing areas in each bar (due to imperfect sampling).
+
+            data.forEach((list, index) => {
+                let topNSum = 0;
+                list.forEach((element) => {
+                    let name = getVirusName(element);
+                    if (indexedVirusNames[name]) {
+                        topNSum += (result[index][name] || 0);
+                    }
+                });
+
+                result[index]['Other'] = 1 - topNSum;
+            });
+
             data = result;
 
             let margin = { top: 20, right: 400, bottom: 50, left: 50 };
             let width = 1250 - margin.left - margin.right;
-            let height = 600 - margin.top - margin.bottom;
+            let height = 700 - margin.top - margin.bottom;
             let svg = body
                 .append('svg')
                 .attr('x', 0)
@@ -180,7 +208,7 @@ function compare(arr, jobIds) {
                 .rangeRound([0, width])
                 .padding(0.4)
                 .align(0.3)
-                .domain(jobIds);
+                .domain(jobNames);
 
             let y = d3.scaleLinear()
                 .rangeRound([height, 0])
@@ -201,7 +229,7 @@ function compare(arr, jobIds) {
                 .selectAll('rect')
                 .data((d) => d)
                 .enter().append('rect')
-                .attr('x', (d) => x(d.data.id))
+                .attr('x', (d) => x(d.data.name))
                 .attr('y', (d) => isNaN(d[1]) ? 0 : y(d[1]))
                 .attr('height', (d) => isNaN(d[0]) || isNaN(d[1]) ? 0 : y(d[0]) - y(d[1]))
                 .attr('width', x.bandwidth());

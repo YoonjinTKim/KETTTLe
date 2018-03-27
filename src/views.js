@@ -98,7 +98,16 @@ router.get('/job/:jid/visualization', loginMiddleware, (req, res) => {
 router.get('/jobs/compare', loginMiddleware, (req, res) => {
     let jobIds = Object.keys(req.query);
     let promises = jobIds.map((jid) => arc.retrieveAbundance(jid).then(visualization.readFile))
-    Promise.all(promises).then((data) => visualization.compare(data, jobIds))
+    Promise.all(promises).then((data) => {
+        return new Promise((resolve, reject) => {
+            db.jobs.find({ _id: { $in : jobIds.map(db.ObjectId) }}, (err, jobs) => {
+                if (err)
+                    reject(err);
+                else
+                    resolve({ data, jobs });
+            });
+        });
+    }).then(({ data, jobs}) => visualization.compare(data, jobs))
         .then((visualizationHTML) => {
             res.render('comparison', { 
                 logged_in: !!req.user,
