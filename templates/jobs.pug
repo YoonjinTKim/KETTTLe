@@ -12,13 +12,12 @@ block content
             table(class='table table-hover' style='width:1050px;')
                 tr
                     td select
-                    td id
+                    td name
                     td status
                     td output
                     td visualization
                     td database
                     td read_count
-                    td qsub_id
                     td last updated
                 each job in jobs
                     tr
@@ -26,7 +25,7 @@ block content
                             td #[input(id='select-job-box' data-job-id=job._id type='checkbox')]
                         else
                             td -
-                        td #{job._id || '-'}
+                        td #{job.name || '-'}
                         td #{job.status || '-'}
                         if job.status === 'completed'
                             td #[a(href='/api/jobs/download/' + job._id) Download]
@@ -36,7 +35,6 @@ block content
                             td -
                         td #{job.database || '-'}
                         td #{job.read_count || '-'}
-                        td #{job.qsub_id ? job.qsub_id.split('.')[0] : '-'}
                         td #{new Date(job.updated_at).toLocaleDateString()}
             ul(class='pagination')
                 if Number(page) === 1

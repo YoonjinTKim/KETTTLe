@@ -88,6 +88,7 @@ module.exports = {
                 status: 'waiting',
                 user_id: req.user._id,
                 database: fields.database,
+                name: fields.name,
                 read_count
             };
 

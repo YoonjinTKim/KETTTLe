@@ -7,6 +7,9 @@ block content
                 h1(style='font-weight:bold') Upload a job
                 form(action='/api/jobs' enctype='multipart/form-data' method='POST')
                     div(class='form-group')
+                        input(class='form-control' type='name' name='name' placeholder='Job name' required)
+
+                    div(class='form-group')
                         div(class='custom-file')
                             input(class='custom-file-input' id='read_1' type='file' name='read_1' required)
                             label(class='custom-file-label' for='read_1') Read 1
