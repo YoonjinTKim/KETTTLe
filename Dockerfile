@@ -24,7 +24,7 @@ RUN chmod 644 /root/.ssh/known_hosts
 COPY . /usr/ketttle
 
 # Expose internal docker container port
-EXPOSE 3000
+EXPOSE $PORT
 
 # Run command
 CMD [ "npm", "start" ]

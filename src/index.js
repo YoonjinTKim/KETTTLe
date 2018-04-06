@@ -78,4 +78,4 @@ app.post('/api/users/login', passport.authenticate('local', { failureRedirect: '
 app.use('/api', require('./api'));
 app.use('/', require('./views'));
 
-app.listen(3000, () => console.log('listening on *:3000'));
+app.listen(process.env.PORT, () => console.log('listening on *:', process.env.PORT));

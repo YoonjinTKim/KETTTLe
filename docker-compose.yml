@@ -10,7 +10,7 @@ services:
 
     # Expose ports
     ports:
-      - "3000:3000"
+      - "6004:6004"
 
     # Link with mongo service
     links:
@@ -27,6 +27,7 @@ services:
      - KETTTLE_EMAIL_CLIENT_ID=${KETTTLE_EMAIL_CLIENT_ID}
      - KETTTLE_EMAIL_CLIENT_SECRET=${KETTTLE_EMAIL_CLIENT_SECRET}
      - KETTTLE_EMAIL_REFRESH_TOKEN=${KETTTLE_EMAIL_REFRESH_TOKEN}
+     - PORT=6004
 
   # The mongodb instance
   mongo:
