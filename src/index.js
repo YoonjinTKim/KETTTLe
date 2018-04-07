@@ -6,6 +6,7 @@ var cookierparser = require('cookie-parser');
 var session = require('express-session');
 var mongoStore = require('connect-mongo')(session);
 var bcrypt = require('bcrypt-nodejs');
+var compression = require('compression');
 
 var db = require('./db');
 var users = require('./api/users');
@@ -53,6 +54,7 @@ app.use((req, res, next) => {
 });
 
 // include necessary app middleware
+app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookierparser());
