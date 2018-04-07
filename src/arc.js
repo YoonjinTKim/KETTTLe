@@ -46,7 +46,7 @@ function copyFile(read1, read2, pathname) {
             mkdir /tmp/${pathname} &&
             mv ${read1} /tmp/${pathname}/read_1.fq &&
             mv ${read2} /tmp/${pathname}/read_2.fq &&
-            scp -v -r /tmp/${pathname} ${sshUrl}: &&
+            scp -v -r /tmp/${pathname} ${sshUrl}:/work/newriver/${process.env.ARC_USER} &&
             rm /tmp/${pathname}/read_1.fq /tmp/${pathname}/read_2.fq &&
             rm -r /tmp/${pathname}`,
             (err) => _promiseHandler(err, resolve, reject)
@@ -88,7 +88,7 @@ function runJob(jobData) {
 function retrieveOutput(jobId) {
     let output = `/tmp/output_${jobId}.tar.gz`;
     return new Promise((resolve, reject) => {
-        exec(`scp ${sshUrl}:${jobId}/output.tar.gz ${output}`,
+        exec(`scp ${sshUrl}:/work/newriver/${process.env.ARC_USER}/${jobId}/output.tar.gz ${output}`,
             (err) => _promiseHandler(err, resolve, reject, output)
         );
     });
@@ -97,7 +97,7 @@ function retrieveOutput(jobId) {
 function retrieveAbundance(jobId) {
     let output = `/tmp/abundance_${jobId}.tar.gz`;
     return new Promise((resolve, reject) => {
-        exec(`scp ${sshUrl}:${jobId}/abundance.tar.gz ${output}`,
+        exec(`scp ${sshUrl}:/work/newriver/${process.env.ARC_USER}/${jobId}/abundance.tar.gz ${output}`,
             (err) => _promiseHandler(err, resolve, reject, output)
         );
     });
