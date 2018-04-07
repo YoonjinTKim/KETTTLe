@@ -5,16 +5,6 @@ var mailer = require('../mailer');
 var logger = require('../logger');
 
 module.exports = {
-    listJobs: (req, res) => {
-        db.jobs.find((err, results) => res.send(results));
-    },
-
-    findJob: (req, res) => {
-        db.jobs.find({ _id: db.ObjectId(req.params.jid) }, (err, result) => {
-            res.send(result);
-        });
-    },
-
     downloadJob: (req, res) => {
         db.jobs.findOne({ _id: db.ObjectId(req.params.jid) }, (err, result) => {
             if (err) {

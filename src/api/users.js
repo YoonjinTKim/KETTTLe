@@ -4,10 +4,6 @@ var logger = require('../logger');
 var bcrypt = require('bcrypt-nodejs');
 
 module.exports = {
-    listUsers: (req, res) => {
-        db.users.find((err, results) => res.send(results));
-    },
-
     createUser: (req, res) => {
         if (req.body.password != req.body.confirmed_password) {
             res.redirect('/ketttle/register?mismatch=true');
