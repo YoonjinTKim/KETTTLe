@@ -44,11 +44,10 @@ function notify(job_id) {
             } 
         }, (err, result) => {
             if (err || !result || !result[0] || !!result[0].user || !!result[0].user[0]) {
-                logger.log({ level: 'error', message: 'Failed to aggregate job info for email notification', job_id });
+                logger.log({ level: 'error', message: 'Failed to aggregate job info for email notification', job_id, err, result });
                 return;
             }
-            // TODO: add prod url
-            let jobUrl = `http://localhost:3000/job/${job_id}/visualization`;
+            let jobUrl = `http://bench.cs.vt.edu/ketttle/job/${job_id}/visualization`;
             let template = pug.renderFile('./templates/job_notification.pug', { 
                 job_id,
                 job_url: jobUrl

@@ -22,7 +22,7 @@ module load jdk/1.8.0
 cp -r $HOME/FastViromeExplorer/bin $WORK
 
 ssh $5@newriver1.arc.vt.edu \
-    "curl https://7f6c927c.ngrok.io/api/jobs/started/$4 -X POST"
+    "curl http://bench.cs.vt.edu/ketttle/api/jobs/started/$4 -X POST"
 
 java -cp $WORK/bin FastViromeExplorer \
     -1 $HOME/$1 \
@@ -32,9 +32,8 @@ java -cp $WORK/bin FastViromeExplorer \
     -o $HOME/$4
 
 # ssh to the login node to send a request to the node server that the job is complete.
-# TODO: the curl url should be replaced with the production url.
 ssh $5@newriver1.arc.vt.edu \
-    "curl https://7f6c927c.ngrok.io/api/jobs/finished/$4 -X POST"
+    "curl http://bench.cs.vt.edu/ketttle/api/jobs/finished/$4 -X POST"
 
 cd $HOME/$4
 mv FastViromeExplorer-final-sorted-abundance.tsv output_$4.tsv
