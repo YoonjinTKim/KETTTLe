@@ -73,7 +73,7 @@ module.exports = {
                 logger.log({ level: 'error', message: 'Failed to parse form during job submission', err });
                 return;
             }
-            res.redirect('/jobs');
+            res.redirect('/ketttle/jobs');
 
             let read_1 = files.read_1;
             let read_2 = files.read_2;

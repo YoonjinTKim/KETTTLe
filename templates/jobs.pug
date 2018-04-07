@@ -28,8 +28,8 @@ block content
                         td #{job.name || '-'}
                         td #{job.status || '-'}
                         if job.status === 'completed'
-                            td #[a(href='/api/jobs/download/' + job._id) Download]
-                            td #[a(href='/job/' + job._id + '/visualization') Visualize]
+                            td #[a(href='/ketttle/api/jobs/download/' + job._id) Download]
+                            td #[a(href='/ketttle/job/' + job._id + '/visualization') Visualize]
                         else
                             td -
                             td -
@@ -42,18 +42,18 @@ block content
                         a(class='page-link') Prev
                 else
                     li(class='page-item')
-                        a(class='page-link' href='/jobs?page=' + (Number(page) - 1)) Prev
+                        a(class='page-link' href='/ketttle/jobs?page=' + (Number(page) - 1)) Prev
                 each pageNum in pages
                     if pageNum === Number(page)
                         li(class='page-item active')
-                            a(class='page-link' href='/jobs?page=' + pageNum) #{pageNum}
+                            a(class='page-link' href='/ketttle/jobs?page=' + pageNum) #{pageNum}
                     else
                         li(class='page-item')
-                            a(class='page-link' href='/jobs?page=' + pageNum) #{pageNum}
+                            a(class='page-link' href='/ketttle/jobs?page=' + pageNum) #{pageNum}
                 if Number(page) === Number(maxPages)
                     li(class='page-item disabled')
                         a(class='page-link') Next
 
                 else
                     li(class='page-item')
-                        a(class='page-link' href='/jobs?page=' + (Number(page) + 1)) Next
+                        a(class='page-link' href='/ketttle/jobs?page=' + (Number(page) + 1)) Next

@@ -20,32 +20,32 @@ html(lang='en')
             integrity='sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl'
             crossorigin='anonymous'
         )
-        link(rel='stylesheet' href='/public/styles.css')
-        script(defer type='text/javascript' src='/public/js/index.js')
+        link(rel='stylesheet' href='/ketttle/public/styles.css')
+        script(defer type='text/javascript' src='/ketttle/public/js/index.js')
     body
         nav(class='navbar navbar-expand-md navbar-dark bg-dark fixed-top')
-            a(class='navbar-brand' href='/') Ketttle
+            a(class='navbar-brand' href='/ketttle') Ketttle
             div(class='collapse navbar-collapse')
                 ul(class='navbar-nav mr-auto')
                     li(class='nav-item')
-                        a(class='nav-link' + (home ? ' active' : '') href='/') Home
+                        a(class='nav-link' + (home ? ' active' : '') href='/ketttle') Home
                             span(class='sr-only') current
 
                     if logged_in
                         li(class='nav-item')
-                            a(class='nav-link' + (upload ? ' active' : '') href='/upload') Upload
+                            a(class='nav-link' + (upload ? ' active' : '') href='/ketttle/upload') Upload
 
                         li(class='nav-item')
-                            a(class='nav-link' + (jobslist ? ' active' : '') href='/jobs') Jobs
+                            a(class='nav-link' + (jobslist ? ' active' : '') href='/ketttle/jobs') Jobs
 
                         li(class='nav-item')
-                            a(class='nav-link' href='/api/users/logout') Logout
+                            a(class='nav-link' href='/ketttle/api/users/logout') Logout
                     else
                         li(class='nav-item')
-                            a(class='nav-link' + (login ? ' active' : '') href='/login') Log In
+                            a(class='nav-link' + (login ? ' active' : '') href='/ketttle/login') Log In
 
                         li(class='nav-item')
-                            a(class='nav-link' + (register ? ' active' : '') href='/register') Register
+                            a(class='nav-link' + (register ? ' active' : '') href='/ketttle/register') Register
         div(style='margin-bottom:100px')
             block content
         footer(class='footer')

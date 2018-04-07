@@ -10,7 +10,7 @@ module.exports = {
 
     createUser: (req, res) => {
         if (req.body.password != req.body.confirmed_password) {
-            res.redirect('/register?mismatch=true');
+            res.redirect('/ketttle/register?mismatch=true');
             return;
         }
 
@@ -25,7 +25,7 @@ module.exports = {
             if (err || result) {
                 if (err)
                     logger.log({ level: 'error', message: 'Failed to find user during registration', userData, err });
-                res.redirect('/register?exists=true');
+                res.redirect('/ketttle/register?exists=true');
                 return;
             } else if (!result) {
                 db.users.insert(userData, (err, result) => {
@@ -33,7 +33,7 @@ module.exports = {
                         emai: userData.email,
                         password: req.body.password,
                         _id: result._id
-                    }, () => res.redirect('/'));
+                    }, () => res.redirect('/ketttle'));
                 });
             }
         });
@@ -41,11 +41,11 @@ module.exports = {
 
     logout: (req, res) => {
         req.logout();
-        res.redirect('/');
+        res.redirect('/ketttle');
     },
 
     login: (req, res) => {
-        res.redirect('/');
+        res.redirect('/ketttle');
     }
 };
 
