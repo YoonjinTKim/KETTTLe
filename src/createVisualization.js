@@ -15,7 +15,14 @@ const NAME = 'VirusName';
 function create(input, job_id) {
     return _uncompress(input, job_id)
         .then(readFile)
-        .then(_parse);
+        .then(_parse)
+        .then((visualization) => {
+            return new Promise((resolve, reject) => {
+                // Remove uncompressed abundance file
+                exec(`rm output_${job_id}.tsv`);
+                resolve(visualization);
+            })
+        });
 }
 
 function _uncompress(compressed, job_id) {
