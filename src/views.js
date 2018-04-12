@@ -6,6 +6,7 @@ const logger = require('./logger');
 const arc = require('./arc');
 const router = express.Router();
 const loginMiddleware = ensureLogin.ensureLoggedIn();
+const exec = require('child_process').exec;
 
 router.get('/', (req, res) => {
     res.render('home', { logged_in: !!req.user, home: true });
@@ -97,17 +98,31 @@ router.get('/job/:jid/visualization', loginMiddleware, (req, res) => {
 
 router.get('/jobs/compare', loginMiddleware, (req, res) => {
     let jobIds = Object.keys(req.query);
-    let promises = jobIds.map((jid) => arc.retrieveAbundance(jid).then(visualization.readFile))
+    let promises = jobIds.map((jid) => {
+        return arc.retrieveAbundance(jid)
+	    .then((file) => visualization.uncompress(file, jid))
+	    .then(visualization.readFile);
+    });
     Promise.all(promises).then((data) => {
+        jobIds.map((jid) => {
+            exec(`rm output_${jid}.tsv`);
+        });
+
         return new Promise((resolve, reject) => {
             db.jobs.find({ _id: { $in : jobIds.map(db.ObjectId) }}, (err, jobs) => {
-                if (err)
+                if (err) {
                     reject(err);
-                else
-                    resolve({ data, jobs });
+                } else {
+		    var indexedJobs = {};
+		    jobs.forEach((job) => {
+			indexedJobs[job._id.toString()] = job;
+		    });
+		    var orderedJobs = jobIds.map((jid) => indexedJobs[jid]);
+                    resolve({ data, jobs: orderedJobs });
+                }
             });
         });
-    }).then(({ data, jobs}) => visualization.compare(data, jobs))
+    }).then(({ data, jobs }) => visualization.compare(data, jobs))
         .then((visualizationHTML) => {
             res.render('comparison', { 
                 logged_in: !!req.user,

@@ -13,7 +13,7 @@ const IDENTIFIER = '#VirusIdentifier';
 const NAME = 'VirusName';
 
 function create(input, job_id) {
-    return _uncompress(input, job_id)
+    return uncompress(input, job_id)
         .then(readFile)
         .then(_parse)
         .then((visualization) => {
@@ -25,7 +25,7 @@ function create(input, job_id) {
         });
 }
 
-function _uncompress(compressed, job_id) {
+function uncompress(compressed, job_id) {
     return new Promise((resolve, reject) => {
         exec(`tar -xvf ${compressed}`, (err, st1, st2) => {
             if (err) 
@@ -287,7 +287,8 @@ function compare(arr, jobs) {
 }
 
 module.exports = {
-	create,
+    uncompress,
+    create,
     readFile,
     compare
 };
